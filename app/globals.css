@@ -498,6 +498,15 @@ body {
     background: radial-gradient(circle at 50% 35%, #3a210f, #5a3518);
     box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 230, 190, 0.3);
   }
+  /* Long rounds: smaller marbles so the rail never crowds the top-bar buttons */
+  .rail[data-dense="true"] {
+    gap: 0.22rem;
+    padding: 0.55rem 0.6rem;
+  }
+  .rail[data-dense="true"] .hole {
+    width: 11px;
+    height: 11px;
+  }
   .hole[data-on="true"] {
     background: radial-gradient(circle at 35% 30%, #fff 0 12%, #8ff0ad 22%, var(--green) 60%, #1d6e36);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -644,6 +653,159 @@ body {
   }
   .ropes::before { left: 16%; }
   .ropes::after { right: 16%; }
+
+  /* =========================================================
+     Colours: sort-into-buckets
+     ========================================================= */
+  .sort-item {
+    position: relative;
+    width: min(56vw, 15rem, 34dvh);
+    aspect-ratio: 1;
+    touch-action: none;
+    cursor: grab;
+    will-change: transform;
+    z-index: 5;
+  }
+  .sort-item[data-ball="true"] {
+    cursor: grabbing;
+  }
+
+  /* Flat paper card (resting) */
+  .sort-card {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 22px;
+    transition:
+      transform 420ms cubic-bezier(0.34, 1.35, 0.5, 1),
+      opacity 160ms ease 60ms,
+      border-radius 300ms ease;
+  }
+  /* Scrunched: the card folds in on itself and gives way to the ball */
+  .sort-item[data-ball="true"] .sort-card {
+    transform: scale(0.34) rotate(-28deg);
+    border-radius: 45%;
+    opacity: 0;
+    transition:
+      transform 240ms cubic-bezier(0.55, 0, 0.75, 0.2),
+      opacity 120ms ease 120ms,
+      border-radius 200ms ease;
+  }
+
+  /* Paper ball (carried): ~40% of the card so it never covers the buckets */
+  .sort-ball {
+    position: absolute;
+    left: 30%;
+    top: 30%;
+    width: 40%;
+    height: 40%;
+    opacity: 0;
+    transform: scale(0.4) rotate(50deg);
+    filter: drop-shadow(0 10px 8px rgba(40, 18, 0, 0.4));
+    transition:
+      transform 200ms ease-in,
+      opacity 120ms ease;
+    pointer-events: none;
+  }
+  .sort-item[data-ball="true"] .sort-ball {
+    opacity: 1;
+    transform: none;
+    transition:
+      transform 360ms cubic-bezier(0.34, 1.7, 0.5, 1) 90ms,
+      opacity 100ms ease 90ms;
+  }
+  .drop-in {
+    animation: drop-in 520ms cubic-bezier(0.34, 1.5, 0.5, 1) both;
+  }
+  @keyframes drop-in {
+    0% { opacity: 0; transform: translateY(-60px) scale(0.7) rotate(-10deg); }
+    100% { opacity: 1; transform: none; }
+  }
+  .nope-shake {
+    animation: nope 420ms ease;
+  }
+  @keyframes nope {
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-9px) rotate(-4deg); }
+    40% { transform: translateX(9px) rotate(4deg); }
+    60% { transform: translateX(-6px) rotate(-2deg); }
+    80% { transform: translateX(4px); }
+  }
+
+  .bucket {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 16px;
+    padding: 0.25rem;
+  }
+  .bucket-body {
+    position: relative;
+    display: block;
+    width: 100%;
+    filter: drop-shadow(0 8px 6px rgba(40, 18, 0, 0.4));
+    transition: transform 160ms cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
+  .bucket:active .bucket-body,
+  .bucket[data-hover="true"] .bucket-body {
+    transform: translateY(-6px) scale(1.08);
+  }
+  .bucket[data-hint="true"] .bucket-body {
+    animation: hint 900ms ease-in-out infinite;
+  }
+  @keyframes hint {
+    0%, 100% { transform: none; }
+    50% { transform: translateY(-10px) scale(1.06); }
+  }
+  .bucket-tag {
+    padding: 0.15rem 0.7rem;
+    border-radius: 6px;
+    background: var(--tex-noise), var(--paper);
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: 0 2px 0 #c9b28a, 0 3px 6px rgba(40, 18, 0, 0.3);
+  }
+  .bucket:focus-visible {
+    outline: 4px solid var(--yellow);
+    outline-offset: 2px;
+  }
+  .slosh .bucket-paint {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: slosh 600ms ease-out;
+  }
+  @keyframes slosh {
+    0% { transform: scale(1, 1); }
+    25% { transform: scale(1.08, 0.5); }
+    55% { transform: scale(0.96, 1.25); }
+    100% { transform: scale(1, 1); }
+  }
+  .slosh {
+    animation: bucket-bounce 500ms cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
+  @keyframes bucket-bounce {
+    0% { transform: none; }
+    30% { transform: scale(1.1, 0.9); }
+    60% { transform: scale(0.96, 1.05); }
+    100% { transform: none; }
+  }
+  .drop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(60, 30, 10, 0.45);
+    animation: drop-fly 700ms cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+  }
+  @keyframes drop-fly {
+    0% { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
+    60% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--dx) * 1.2), calc(-50% + var(--dy) + 40px)) scale(0.8); opacity: 0; }
+  }
 
   /* ---------- Larger screens ---------- */
   @media (min-width: 640px) {

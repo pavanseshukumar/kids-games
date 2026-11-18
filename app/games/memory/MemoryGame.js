@@ -1,10 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { sound } from "@/lib/sound";
-import { AppBar, CheckSticker, HomeButton, SoundButton, Stars } from "@/components/ui";
-import { ArrowIcon, BackIcon, PlayIcon, ReplayIcon } from "@/components/icons";
+import { saveStars, useBestStars } from "@/lib/progress";
+import { AppBar, CheckSticker, HomeButton, SoundButton } from "@/components/ui";
+import { LevelButton, ProgressRail, StepHeading, WinSheet } from "@/components/game-ui";
+import { BackIcon } from "@/components/icons";
 import { CARD_SETS, CardArt, CardBack, CardFan, MatchSticker } from "./art";
+
+const GAME = "memory";
 
 const LEVELS = [
   { id: "easy", name: "Easy", pairs: 3, cols: 3, rows: 2, peek: 1600 },
@@ -13,7 +17,6 @@ const LEVELS = [
 ];
 
 const CHEERS = ["Great!", "Awesome!", "Super!", "Amazing!", "Wow!"];
-const CONFETTI_COLORS = ["#E5483B", "#F59A2E", "#F8C630", "#3FB35F", "#3A8DE6", "#F2709C"];
 
 function shuffle(arr) {
   const a = [...arr];
@@ -35,36 +38,6 @@ function starsFor(moves, pairs) {
   return 1;
 }
 
-// Best stars per level, kept in this browser only.
-const BEST_KEY = "memory-best";
-const bestListeners = new Set();
-function subscribeBest(fn) {
-  bestListeners.add(fn);
-  return () => bestListeners.delete(fn);
-}
-function readBestRaw() {
-  try {
-    return localStorage.getItem(BEST_KEY) || "{}";
-  } catch {
-    return "{}";
-  }
-}
-function parseBest(raw) {
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
-}
-function saveStars(levelId, stars) {
-  const prev = parseBest(readBestRaw());
-  if ((prev[levelId] || 0) >= stars) return;
-  try {
-    localStorage.setItem(BEST_KEY, JSON.stringify({ ...prev, [levelId]: stars }));
-  } catch {}
-  bestListeners.forEach((fn) => fn());
-}
-
 export default function MemoryGame() {
   const [setId, setSetId] = useState(CARD_SETS[0].id);
   const [levelId, setLevelId] = useState(null); // null = picker screen
@@ -76,10 +49,8 @@ export default function MemoryGame() {
   const [moves, setMoves] = useState(0);
   const [phase, setPhase] = useState("idle"); // idle | peek | play | won
   const [cheer, setCheer] = useState(null);
-  const [confetti, setConfetti] = useState([]);
 
-  const bestRaw = useSyncExternalStore(subscribeBest, readBestRaw, () => "{}");
-  const best = useMemo(() => parseBest(bestRaw), [bestRaw]);
+  const best = useBestStars(GAME);
 
   const lock = useRef(false);
   const streak = useRef(0);
@@ -110,7 +81,6 @@ export default function MemoryGame() {
       setWrong([]);
       setMoves(0);
       setCheer(null);
-      setConfetti([]);
       streak.current = 0;
       lock.current = true;
       // Deal the cards in, then show them all for a quick peek.
@@ -133,18 +103,7 @@ export default function MemoryGame() {
 
   const win = useCallback(
     (finalMoves) => {
-      saveStars(level.id, starsFor(finalMoves, level.pairs));
-      setConfetti(
-        Array.from({ length: 50 }, (_, i) => ({
-          id: i,
-          left: Math.random() * 100,
-          dx: (Math.random() - 0.5) * 220,
-          rot: (Math.random() - 0.5) * 1080,
-          dur: 2.4 + Math.random() * 1.6,
-          delay: Math.random() * 0.5,
-          color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-        }))
-      );
+      saveStars(GAME, level.id, starsFor(finalMoves, level.pairs));
       sound.win();
       setPhase("won");
     },
@@ -206,9 +165,9 @@ export default function MemoryGame() {
           </header>
 
           <section aria-labelledby="sets-heading">
-            <h2 id="sets-heading" className="engraved label mb-3 flex items-center justify-center gap-2">
-              <StepDot n={1} /> Pick your cards
-            </h2>
+            <StepHeading n={1} id="sets-heading">
+              Pick your cards
+            </StepHeading>
             <div className="grid grid-cols-3 gap-3 sm:gap-5">
               {CARD_SETS.map((s) => {
                 const on = s.id === setId;
@@ -234,32 +193,23 @@ export default function MemoryGame() {
           </section>
 
           <section aria-labelledby="size-heading">
-            <h2 id="size-heading" className="engraved label mb-3 flex items-center justify-center gap-2">
-              <StepDot n={2} /> Pick a size to play
-            </h2>
+            <StepHeading n={2} id="size-heading">
+              Pick a size to play
+            </StepHeading>
             <div className="grid gap-3 sm:grid-cols-3 sm:gap-5">
               {LEVELS.map((l) => (
-                <button
+                <LevelButton
                   key={l.id}
                   data-level={l.id}
+                  preview={<BoardPreview cols={l.cols} rows={l.rows} />}
+                  name={l.name}
+                  detail={`${l.pairs * 2} cards`}
+                  stars={best[l.id] || 0}
                   onClick={() => {
                     sound.tap();
                     start(l.id);
                   }}
-                  className="tile items-center gap-4 px-4 py-3 text-left sm:flex-col sm:gap-2 sm:px-4 sm:py-5 sm:text-center"
-                >
-                  <BoardPreview cols={l.cols} rows={l.rows} />
-                  <span className="flex min-w-0 flex-1 flex-col sm:items-center">
-                    <span className="printed text-2xl font-semibold">{l.name}</span>
-                    <span className="printed-soft text-base">{l.pairs * 2} cards</span>
-                    <span className="mt-1">
-                      <Stars count={best[l.id] || 0} size={22} />
-                    </span>
-                  </span>
-                  <span className="play-badge sm:hidden" aria-hidden>
-                    <PlayIcon />
-                  </span>
-                </button>
+                />
               ))}
             </div>
           </section>
@@ -271,7 +221,6 @@ export default function MemoryGame() {
   /* ---------------- Game board ---------------- */
   const showAll = phase === "peek";
   const found = matched.size / 2;
-  const stars = starsFor(moves, level.pairs);
   const nextLevel = LEVELS[LEVELS.findIndex((l) => l.id === level.id) + 1];
 
   return (
@@ -282,13 +231,7 @@ export default function MemoryGame() {
             <BackIcon />
           </button>
         }
-        center={
-          <div className="rail" role="status" aria-label={`${found} of ${level.pairs} pairs found`}>
-            {Array.from({ length: level.pairs }, (_, i) => (
-              <span key={i} className="hole" data-on={i < found} />
-            ))}
-          </div>
-        }
+        center={<ProgressRail total={level.pairs} done={found} label={`${found} of ${level.pairs} pairs found`} />}
         right={<SoundButton />}
       />
 
@@ -349,81 +292,17 @@ export default function MemoryGame() {
       </div>
 
       {phase === "won" && (
-        <div className="scrim fixed inset-0 z-20 flex items-end justify-center sm:items-center sm:p-4">
-          <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
-            {confetti.map((c) => (
-              <span
-                key={c.id}
-                className="confetti"
-                style={{
-                  left: `${c.left}%`,
-                  background: c.color,
-                  "--dx": `${c.dx}px`,
-                  "--rot": `${c.rot}deg`,
-                  "--dur": `${c.dur}s`,
-                  "--delay": `${c.delay}s`,
-                }}
-              />
-            ))}
-          </div>
-          <div role="dialog" aria-modal="true" aria-labelledby="win-title" className="paper sheet relative text-center">
-            <span className="sheet-handle" aria-hidden />
-            <div className="isolate inline-block">
-              <h2 id="win-title" className="ribbon text-3xl sm:text-4xl">
-                You did it!
-              </h2>
-            </div>
-            <div className="my-5 flex justify-center">
-              <Stars count={stars} size={68} animate />
-            </div>
-            <p className="printed text-xl font-medium">
-              All {level.pairs} pairs in {moves} tries
-            </p>
-            <p className="printed-soft mt-1 text-base">
-              {level.name} · {cardSet.name}
-            </p>
-            <div className="mt-6 flex flex-col gap-4">
-              {nextLevel ? (
-                <>
-                  <button onClick={() => start(nextLevel.id)} className="btn w-full" autoFocus>
-                    Try {nextLevel.name} <ArrowIcon />
-                  </button>
-                  <button onClick={() => start(level.id)} className="btn btn-cream w-full">
-                    <ReplayIcon /> Play again
-                  </button>
-                </>
-              ) : (
-                <button onClick={() => start(level.id)} className="btn w-full" autoFocus>
-                  <ReplayIcon /> Play again
-                </button>
-              )}
-              <button
-                onClick={backToPicker}
-                className="printed-soft min-h-12 text-lg font-semibold underline decoration-2 underline-offset-4"
-              >
-                Choose other cards
-              </button>
-            </div>
-          </div>
-        </div>
+        <WinSheet
+          stars={starsFor(moves, level.pairs)}
+          summary={`All ${level.pairs} pairs in ${moves} tries`}
+          detail={`${level.name} · ${cardSet.name}`}
+          next={nextLevel && { label: `Try ${nextLevel.name}`, onClick: () => start(nextLevel.id) }}
+          onReplay={() => start(level.id)}
+          onMenu={backToPicker}
+          menuLabel="Choose other cards"
+        />
       )}
     </main>
-  );
-}
-
-function StepDot({ n }) {
-  return (
-    <span
-      className="grid size-6 place-items-center rounded-full text-sm text-white"
-      style={{
-        background: "radial-gradient(circle at 40% 30%, #ff8c7e, #e5483b 65%)",
-        boxShadow: "0 2px 0 #a42c22, inset 0 1px 1px rgba(255,255,255,.6)",
-        textShadow: "0 1px 0 rgba(0,0,0,.3)",
-      }}
-      aria-hidden
-    >
-      {n}
-    </span>
   );
 }
 
@@ -460,14 +339,7 @@ function BoardPreview({ cols, rows }) {
           <g key={i}>
             <rect x={x} y={y + 0.8} width={cell} height={cell} rx={cell * 0.22} fill="#0F3A22" opacity="0.45" />
             <rect x={x} y={y} width={cell} height={cell} rx={cell * 0.22} fill="#FFFAF0" />
-            <rect
-              x={x + cell * 0.14}
-              y={y + cell * 0.14}
-              width={cell * 0.72}
-              height={cell * 0.72}
-              rx={cell * 0.14}
-              fill="url(#pv-card)"
-            />
+            <rect x={x + cell * 0.14} y={y + cell * 0.14} width={cell * 0.72} height={cell * 0.72} rx={cell * 0.14} fill="url(#pv-card)" />
           </g>
         );
       })}
