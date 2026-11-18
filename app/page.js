@@ -8,6 +8,7 @@ import { Hole, Piece } from "./games/shapes/art";
 import { Bead } from "./games/patterns/art";
 import { Balloon } from "./games/balloons/art";
 import { FlowerPot, Pipe, Tap } from "./games/water/art";
+import { Carriage, Engine, Station, Tree } from "./games/train/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -142,6 +143,35 @@ function WaterCover() {
   );
 }
 
+function TrainCover() {
+  const d = "M60 60H200Q260 60 260 120V140Q260 200 320 200H460";
+  return (
+    <svg viewBox="0 0 520 260" className="absolute inset-[6%] h-[88%] w-[88%]" aria-hidden>
+      <path d={d} fill="none" stroke="#7A4A22" strokeWidth="46" strokeDasharray="9 15" />
+      <path d={d} fill="none" stroke="#B9BEC4" strokeWidth="32" />
+      <path d={d} fill="none" stroke="#2A7A4B" strokeWidth="22" />
+      <g transform="translate(60 60)">
+        <Station />
+      </g>
+      <g transform="translate(460 200)">
+        <Station flag />
+      </g>
+      <g transform="translate(120 190) scale(1.1)">
+        <Tree />
+      </g>
+      <g transform="translate(400 70) scale(0.9)">
+        <Tree />
+      </g>
+      <g transform="translate(150 60)">
+        <Carriage riders={2} />
+      </g>
+      <g transform="translate(226 66) rotate(25)">
+        <Engine />
+      </g>
+    </svg>
+  );
+}
+
 function PatternsCover() {
   return (
     <div className="absolute inset-x-[8%] top-[12%] bottom-[16%] flex flex-col items-center justify-between">
@@ -164,12 +194,13 @@ function PatternsCover() {
 
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
-  { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
-  { href: "/games/counting", title: "Counting", blurb: "Count the things and pick the right number.", Cover: CountingCover, btn: "btn-orange" },
-  { href: "/games/shapes", title: "Shape Sorter", blurb: "Fit each wooden shape into its hole.", Cover: ShapesCover, btn: "btn-red" },
-  { href: "/games/patterns", title: "What Comes Next?", blurb: "Finish the bead pattern on the string.", Cover: PatternsCover, btn: "btn-blue" },
+  // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
+  // { href: "/games/counting", title: "Counting", blurb: "Count the things and pick the right number.", Cover: CountingCover, btn: "btn-orange" },
+  // { href: "/games/shapes", title: "Shape Sorter", blurb: "Fit each wooden shape into its hole.", Cover: ShapesCover, btn: "btn-red" },
+  // { href: "/games/patterns", title: "What Comes Next?", blurb: "Finish the bead pattern on the string.", Cover: PatternsCover, btn: "btn-blue" },
   { href: "/games/balloons", title: "Pop the Balloons", blurb: "Pop only the balloons the card asks for.", Cover: BalloonsCover, btn: "btn-orange" },
   { href: "/games/water", title: "Water Flow", blurb: "Turn the pipes to water the flower.", Cover: WaterCover, btn: "btn-blue" },
+  { href: "/games/train", title: "Train Track", blurb: "Draw a track and drive the train home.", Cover: TrainCover, btn: "btn-red" },
 ];
 
 export default function Home() {

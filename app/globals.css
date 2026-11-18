@@ -1521,6 +1521,219 @@ body {
     transform: none;
   }
 
+  /* =========================================================
+     Train Track
+     ========================================================= */
+  .train-map {
+    display: block;
+    height: auto;
+    touch-action: none;
+    cursor: crosshair;
+    border-radius: 14px;
+  }
+  .map-cell {
+    fill: rgba(255, 246, 210, 0.07);
+    stroke: rgba(255, 246, 210, 0.22);
+    stroke-width: 2;
+    stroke-dasharray: 6 6;
+  }
+  .map-cell[data-kind="pond"],
+  .map-cell[data-kind="tree"],
+  .map-cell[data-kind="rock"] {
+    fill: rgba(0, 0, 0, 0.06);
+    stroke: none;
+  }
+  /* "Start here" ring around the train */
+  .map-start-ring {
+    fill: none;
+    stroke: #fff6a8;
+    stroke-width: 6;
+    stroke-dasharray: 14 10;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: start-ring 1.2s ease-in-out infinite;
+  }
+  @keyframes start-ring {
+    0%, 100% { opacity: 0.4; scale: 0.92; }
+    50% { opacity: 1; scale: 1.08; }
+  }
+  .map-goal[data-done="true"] {
+    filter: drop-shadow(0 0 10px rgba(255, 236, 160, 0.95));
+  }
+  .map-stop[data-need="true"] {
+    animation: stop-need 0.9s ease-in-out infinite;
+  }
+  @keyframes stop-need {
+    0%, 100% { filter: none; }
+    50% { filter: drop-shadow(0 0 12px rgba(255, 236, 160, 1)); }
+  }
+  .train-stop-person {
+    transition: opacity 300ms ease;
+  }
+  .train-stop[data-boarded="true"] .train-stop-person {
+    opacity: 0;
+  }
+  .train-stop-tick {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    scale: 0.3;
+    transition: opacity 250ms ease 150ms, scale 380ms cubic-bezier(0.34, 1.8, 0.5, 1) 150ms;
+  }
+  .train-stop[data-boarded="true"] .train-stop-tick {
+    opacity: 1;
+    scale: 1;
+  }
+  /* Passenger waving "pick me up!" */
+  .kid-wave {
+    transform-box: view-box;
+    transform-origin: 13px 0px;
+    animation: kid-wave 0.9s ease-in-out infinite alternate;
+  }
+  @keyframes kid-wave {
+    from { rotate: -18deg; }
+    to { rotate: 22deg; }
+  }
+  .stop-bubble {
+    animation: bubble-bob 1.2s ease-in-out infinite;
+  }
+  @keyframes bubble-bob {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -5px; }
+  }
+
+  /* Wooden collection tray with recessed slots */
+  .collect-tray {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 9999px;
+    background: var(--tex-grain), linear-gradient(180deg, #d9a066, #b47843);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 230, 190, 0.45),
+      inset 0 -3px 0 rgba(80, 40, 10, 0.35),
+      0 3px 0 #7a4a22,
+      0 6px 10px rgba(40, 18, 0, 0.4);
+  }
+  .tray-slot {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 50% 35%, #5a3518, #3a210f);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 230, 190, 0.35);
+  }
+  .tray-slot[data-filled="true"] {
+    background: radial-gradient(circle at 50% 35%, #fff4c4, #f3d27a 70%);
+    box-shadow: inset 0 2px 3px rgba(150, 95, 10, 0.4), 0 0 12px rgba(255, 220, 120, 0.8);
+    animation: slot-fill 420ms cubic-bezier(0.34, 1.8, 0.5, 1);
+  }
+  .tray-seat[data-filled="true"] {
+    background: radial-gradient(circle at 50% 35%, #e8dcff, #b99be8 70%);
+    box-shadow: inset 0 2px 3px rgba(80, 40, 140, 0.35), 0 0 12px rgba(185, 155, 232, 0.8);
+  }
+  @keyframes slot-fill {
+    0% { scale: 1.35; }
+    100% { scale: 1; }
+  }
+  .tray-divider {
+    width: 2px;
+    height: 28px;
+    margin: 0 0.15rem;
+    border-radius: 2px;
+    background: rgba(60, 30, 10, 0.45);
+    box-shadow: 1px 0 0 rgba(255, 230, 190, 0.3);
+  }
+  /* A collected star / passenger flying from the map into its slot */
+  .tray-flyer {
+    position: fixed;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    animation: tray-fly 650ms cubic-bezier(0.45, -0.25, 0.55, 1) forwards;
+    filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.35));
+  }
+  @keyframes tray-fly {
+    0% { translate: 0 0; scale: 1; }
+    40% { scale: 1.5; }
+    100% { translate: var(--dx) var(--dy); scale: 0.85; }
+  }
+  /* After a failed run: what the train missed */
+  .missed-ring {
+    fill: rgba(229, 72, 59, 0.2);
+    stroke: #e5483b;
+    stroke-width: 5;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: missed-pulse 0.9s ease-in-out infinite;
+  }
+  @keyframes missed-pulse {
+    0%, 100% { scale: 0.9; opacity: 0.6; }
+    50% { scale: 1.1; opacity: 1; }
+  }
+  .missed-item {
+    display: inline-grid;
+    place-items: center;
+    animation: nope 600ms ease 300ms;
+  }
+
+  /* "The train will pick this up" ring on stars the track goes over */
+  .on-track-ring {
+    fill: rgba(255, 236, 160, 0.25);
+    stroke: #fff3a6;
+    stroke-width: 4;
+    stroke-dasharray: 10 7;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ring-spin 4s linear infinite;
+  }
+  @keyframes ring-spin {
+    to { rotate: 360deg; }
+  }
+  .train-star {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: star-bob 1.6s ease-in-out infinite;
+  }
+  @keyframes star-bob {
+    0%, 100% { scale: 1; rotate: -6deg; }
+    50% { scale: 1.12; rotate: 6deg; }
+  }
+  .track {
+    filter: drop-shadow(0 3px 2px rgba(5, 30, 15, 0.45));
+  }
+  .train-puff {
+    fill: #fff;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: puff 1.1s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes puff {
+    from { opacity: 0.85; scale: 0.5; }
+    to { opacity: 0; scale: 2.4; translate: 0 -18px; }
+  }
+  .train-puff-loop {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: puff 1.4s ease-out infinite;
+  }
+  .go-btn:disabled {
+    filter: grayscale(0.85) brightness(1.05);
+    opacity: 0.75;
+  }
+  .go-btn[data-ready="true"] {
+    animation: hint 900ms ease-in-out infinite;
+  }
+  .knob:disabled {
+    opacity: 0.5;
+  }
+
   /* The pinned rule card */
   .rule-card {
     display: inline-flex;
