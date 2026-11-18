@@ -3,10 +3,10 @@ import { AppBar, SoundButton } from "@/components/ui";
 import { PlayIcon } from "@/components/icons";
 import { CARD_SETS, CardFan } from "./games/memory/art";
 import { Bucket, ItemArt, makeItem } from "./games/colours/art";
+import { NumberBlock } from "./games/counting/art";
 
-const COVER_ITEM = makeItem("star", "red");
-
-const INK = "#3D2A1E";
+const STAR = makeItem("star", "red");
+const BALLOON = makeItem("balloon", "blue");
 
 function MemoryCover() {
   return (
@@ -20,7 +20,7 @@ function ColoursCover() {
   return (
     <div className="absolute inset-x-[10%] top-[10%] bottom-[8%] flex flex-col items-center justify-between">
       <span className="mini-card-front grid aspect-square w-[24%] -rotate-6 place-items-center rounded-[10px]">
-        <ItemArt item={COVER_ITEM} className="h-[78%] w-[78%]" />
+        <ItemArt item={STAR} className="h-[78%] w-[78%]" />
       </span>
       <span className="flex w-full items-end justify-center gap-[4%]">
         {["red", "yellow", "blue"].map((c) => (
@@ -33,28 +33,35 @@ function ColoursCover() {
   );
 }
 
-function CountingArt() {
-  const colors = ["#F2709C", "#3FA9F5", "#4CCB7E"];
+function CountingCover() {
   return (
-    <svg viewBox="0 0 120 90" className="h-full w-full" aria-hidden>
-      <g stroke={INK} strokeWidth="3" strokeLinejoin="round">
-        {colors.map((c, i) => (
-          <g key={c}>
-            <rect x={14 + i * 34} y={70 - (i + 1) * 18} width="28" height={(i + 1) * 18} rx="4" fill={c} />
-            <text x={28 + i * 34} y={70 - (i + 1) * 18 - 6} textAnchor="middle" fontSize="16" fontWeight="700" fill={INK} stroke="none" fontFamily="inherit">
-              {i + 1}
-            </text>
-          </g>
+    <div className="absolute inset-x-[10%] top-[12%] bottom-[10%] flex flex-col items-center justify-between">
+      <span className="flex w-full justify-center gap-[3%]">
+        {[-6, 4, -3].map((t, i) => (
+          <span key={i} className="w-[18%] drop-shadow-[0_4px_3px_rgba(0,0,0,0.4)]" style={{ transform: `rotate(${t}deg)` }}>
+            <ItemArt item={BALLOON} className="h-full w-full" />
+          </span>
         ))}
-        <path d="M8 72h104" />
-      </g>
-    </svg>
+      </span>
+      <span className="flex w-full items-end justify-center gap-[4%]">
+        {[
+          [2, "red"],
+          [3, "blue"],
+          [4, "green"],
+        ].map(([v, p]) => (
+          <span key={v} className={`w-[22%] drop-shadow-[0_5px_4px_rgba(0,0,0,0.4)] ${v === 3 ? "-translate-y-[10%]" : ""}`}>
+            <NumberBlock value={v} paint={p} />
+          </span>
+        ))}
+      </span>
+    </div>
   );
 }
 
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
+  { href: "/games/counting", title: "Counting", blurb: "Count the things and pick the right number.", Cover: CountingCover, btn: "btn-orange" },
 ];
 
 export default function Home() {
@@ -72,12 +79,12 @@ export default function Home() {
         <p className="engraved mt-5 text-xl font-medium sm:text-2xl">Pick a game and have fun!</p>
       </section>
 
-      <section aria-labelledby="games-heading" className="mx-auto w-full max-w-3xl">
+      <section aria-labelledby="games-heading" className="mx-auto w-full max-w-5xl">
         <h2 id="games-heading" className="sr-only">
           Games
         </h2>
 
-        <ul className="grid gap-5 sm:grid-cols-2">
+        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {GAMES.map(({ href, title, blurb, Cover, btn }) => (
             <li key={href}>
               <Link href={href} className="game-link block h-full rounded-[22px]">
@@ -98,14 +105,10 @@ export default function Home() {
           ))}
         </ul>
 
-        {/* Coming soon: paper note with masking tape */}
         <div className="mx-auto mt-8 max-w-xs">
-          <div className="paper flex items-center gap-4 px-4 pt-6 pb-4" style={{ transform: "rotate(-1.5deg)" }} role="group" aria-label="Counting, coming soon">
+          <div className="paper px-4 pt-6 pb-4 text-center" style={{ transform: "rotate(-1.5deg)" }}>
             <span className="tape -top-3 left-1/2 -translate-x-1/2 rotate-[-3deg] whitespace-nowrap">Coming soon</span>
-            <span className="block h-14 w-20 shrink-0 opacity-75 grayscale-[35%]">
-              <CountingArt />
-            </span>
-            <h3 className="printed text-xl font-semibold">Counting</h3>
+            <p className="printed text-lg font-semibold">More games are on the way!</p>
           </div>
         </div>
       </section>
