@@ -1412,6 +1412,115 @@ body {
     box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(120, 70, 0, 0.35);
   }
 
+  /* =========================================================
+     Water Flow
+     ========================================================= */
+  .water-board {
+    --tile: min(calc((100vw - 3.25rem) / (var(--n) + 1.4)), calc((100dvh - 15rem) / var(--n)), 6.5rem);
+    display: grid;
+    grid-template-columns: calc(var(--tile) * 0.64) repeat(var(--n), var(--tile)) calc(var(--tile) * 0.64);
+    grid-template-rows: repeat(var(--n), var(--tile));
+    padding: 0.8rem 0.5rem;
+  }
+  .water-end {
+    display: block;
+    height: var(--tile);
+    position: relative;
+    z-index: 2;
+  }
+  /* Recessed square in the board that holds one pipe */
+  .pipe-tile {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: rgba(70, 35, 10, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(70, 35, 10, 0.28), inset 0 2px 4px rgba(50, 25, 5, 0.25);
+  }
+  .pipe-tile:disabled {
+    background:
+      radial-gradient(circle at 30% 35%, rgba(255, 235, 200, 0.35) 0 9%, transparent 10%),
+      radial-gradient(circle at 68% 62%, rgba(255, 235, 200, 0.3) 0 7%, transparent 8%),
+      rgba(70, 35, 10, 0.16);
+  }
+  .pipe-tile:not(:disabled):active .pipe-turn {
+    scale: 0.92;
+  }
+  .pipe-tile:focus-visible {
+    outline: 4px solid var(--yellow);
+    outline-offset: -2px;
+    z-index: 3;
+  }
+  .pipe-tile-mini {
+    display: block;
+    background: rgba(70, 35, 10, 0.2);
+    border-radius: 2px;
+  }
+  .pipe-turn {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transform 240ms cubic-bezier(0.34, 1.5, 0.5, 1), scale 120ms ease;
+    filter: drop-shadow(0 3px 2px rgba(40, 18, 0, 0.35));
+  }
+  .pipe-channel {
+    stroke: #3b2a1e;
+    transition: stroke 200ms ease;
+  }
+  /* Water arrives tile by tile, further tiles a little later */
+  .pipe-channel[data-wet="true"] {
+    stroke: #3fa9f5;
+    transition-delay: calc(var(--d, 0) * 90ms);
+  }
+  .pipe-flow {
+    stroke: #bfe6ff;
+    stroke-dasharray: 7 11;
+    stroke-linecap: round;
+    animation: pipe-flow 700ms linear infinite, fade-in 300ms ease both;
+    animation-delay: 0ms, calc(var(--d, 0) * 90ms);
+  }
+  @keyframes pipe-flow {
+    to { stroke-dashoffset: -18; }
+  }
+  .pipe-tile[data-hint="true"] {
+    animation: pipe-hint 1.1s ease-in-out infinite;
+    z-index: 2;
+  }
+  /* `scale` (not transform) so it doesn't fight the pipe's rotation */
+  .pipe-tile[data-hint="true"] .pipe-turn {
+    animation: pipe-nudge 1.1s ease-in-out infinite;
+  }
+  @keyframes pipe-nudge {
+    0%, 100% { scale: 1; }
+    50% { scale: 1.1; }
+  }
+  @keyframes pipe-hint {
+    0%, 100% { box-shadow: inset 0 0 0 2px rgba(255, 236, 160, 0.2); }
+    50% { box-shadow: inset 0 0 0 4px rgba(255, 236, 160, 0.95), 0 0 16px rgba(255, 236, 160, 0.8); }
+  }
+  .water-board[data-solved="true"] {
+    animation: board-done 600ms cubic-bezier(0.34, 1.6, 0.5, 1) 500ms;
+  }
+  /* The flower droops and is pale until it gets water */
+  .flower {
+    transform-origin: 40px 66px;
+    transform: rotate(-30deg);
+    filter: saturate(0.35) brightness(0.95);
+    transition: transform 700ms cubic-bezier(0.34, 1.6, 0.5, 1) 300ms, filter 600ms ease 300ms;
+  }
+  .flower[data-bloom="true"] {
+    transform: none;
+    filter: none;
+  }
+  .flower-head {
+    transform-origin: 40px 26px;
+    transform: scale(0.45);
+    transition: transform 700ms cubic-bezier(0.34, 1.8, 0.5, 1) 500ms;
+  }
+  .flower[data-bloom="true"] .flower-head {
+    transform: none;
+  }
+
   /* The pinned rule card */
   .rule-card {
     display: inline-flex;

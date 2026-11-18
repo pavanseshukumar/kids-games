@@ -7,6 +7,7 @@ import { NumberBlock } from "./games/counting/art";
 import { Hole, Piece } from "./games/shapes/art";
 import { Bead } from "./games/patterns/art";
 import { Balloon } from "./games/balloons/art";
+import { FlowerPot, Pipe, Tap } from "./games/water/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -108,6 +109,39 @@ function BalloonsCover() {
   );
 }
 
+function WaterCover() {
+  // tap → straight → bend down → bend right → pot
+  const tiles = [
+    ["straight", 1, true],
+    ["corner", 2, true],
+    [null],
+    [null],
+    ["corner", 0, true],
+    ["straight", 1, false],
+  ];
+  return (
+    <div className="absolute inset-[9%] grid place-items-center">
+      <div className="water-board sorter-board" style={{ "--n": 3, "--tile": "min(3.4rem, 15vw)", gridTemplateRows: "repeat(2, var(--tile))", gridTemplateColumns: "calc(var(--tile) * .64) repeat(3, var(--tile)) calc(var(--tile) * .64)", padding: "0.4rem 0.3rem" }}>
+        <span className="water-end" style={{ gridColumn: 1, gridRow: 1 }}>
+          <Tap />
+        </span>
+        {tiles.map(([type, rot, wet], i) => (
+          <span key={i} className="pipe-tile" style={{ gridColumn: (i % 3) + 2, gridRow: Math.floor(i / 3) + 1 }}>
+            {type && (
+              <span className="pipe-turn" style={{ transform: `rotate(${rot * 90}deg)` }}>
+                <Pipe type={type} wet={wet} />
+              </span>
+            )}
+          </span>
+        ))}
+        <span className="water-end" style={{ gridColumn: 5, gridRow: 2 }}>
+          <FlowerPot bloom={false} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function PatternsCover() {
   return (
     <div className="absolute inset-x-[8%] top-[12%] bottom-[16%] flex flex-col items-center justify-between">
@@ -135,6 +169,7 @@ const GAMES = [
   { href: "/games/shapes", title: "Shape Sorter", blurb: "Fit each wooden shape into its hole.", Cover: ShapesCover, btn: "btn-red" },
   { href: "/games/patterns", title: "What Comes Next?", blurb: "Finish the bead pattern on the string.", Cover: PatternsCover, btn: "btn-blue" },
   { href: "/games/balloons", title: "Pop the Balloons", blurb: "Pop only the balloons the card asks for.", Cover: BalloonsCover, btn: "btn-orange" },
+  { href: "/games/water", title: "Water Flow", blurb: "Turn the pipes to water the flower.", Cover: WaterCover, btn: "btn-blue" },
 ];
 
 export default function Home() {
