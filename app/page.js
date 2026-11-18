@@ -5,6 +5,8 @@ import { CARD_SETS, CardFan } from "./games/memory/art";
 import { Bucket, ItemArt, makeItem } from "./games/colours/art";
 import { NumberBlock } from "./games/counting/art";
 import { Hole, Piece } from "./games/shapes/art";
+import { Bead } from "./games/patterns/art";
+import { Balloon } from "./games/balloons/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -85,11 +87,54 @@ function ShapesCover() {
   );
 }
 
+function BalloonsCover() {
+  return (
+    <div className="sky absolute inset-[7%] overflow-hidden">
+      {[
+        ["red", 10, 34, -8],
+        ["blue", 34, 10, 4],
+        ["red", 58, 28, 8],
+        ["yellow", 78, 46, -4],
+      ].map(([p, x, y, r], i) => (
+        <span
+          key={i}
+          className="absolute w-[17%] drop-shadow-[0_5px_4px_rgba(20,50,90,0.3)]"
+          style={{ left: `${x}%`, top: `${y}%`, transform: `rotate(${r}deg)` }}
+        >
+          <Balloon paint={p} />
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function PatternsCover() {
+  return (
+    <div className="absolute inset-x-[8%] top-[12%] bottom-[16%] flex flex-col items-center justify-between">
+      <span className="w-[16%] rotate-6 drop-shadow-[0_8px_6px_rgba(0,0,0,0.4)]">
+        <Bead paint="blue" />
+      </span>
+      <span className="bead-string w-full" style={{ "--bead": "15%", gap: "2%" }}>
+        {["red", "blue", "red", "blue", "red"].map((p, i) => (
+          <span key={i} className="bead-slot">
+            <Bead paint={p} />
+          </span>
+        ))}
+        <span className="bead-slot bead-gap" style={{ fontSize: "1.25rem" }}>
+          ?
+        </span>
+      </span>
+    </div>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
   { href: "/games/counting", title: "Counting", blurb: "Count the things and pick the right number.", Cover: CountingCover, btn: "btn-orange" },
   { href: "/games/shapes", title: "Shape Sorter", blurb: "Fit each wooden shape into its hole.", Cover: ShapesCover, btn: "btn-red" },
+  { href: "/games/patterns", title: "What Comes Next?", blurb: "Finish the bead pattern on the string.", Cover: PatternsCover, btn: "btn-blue" },
+  { href: "/games/balloons", title: "Pop the Balloons", blurb: "Pop only the balloons the card asks for.", Cover: BalloonsCover, btn: "btn-orange" },
 ];
 
 export default function Home() {

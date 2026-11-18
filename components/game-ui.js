@@ -27,8 +27,8 @@ export function StepHeading({ n, children, id }) {
   );
 }
 
-/** Paper tile that starts a level: preview art, name, detail, best stars. */
-export function LevelButton({ preview, name, detail, stars, onClick, ...rest }) {
+/** Paper tile that starts a level: preview art, name, detail, best stars (or best score for endless games). */
+export function LevelButton({ preview, name, detail, stars, bestScore, onClick, ...rest }) {
   return (
     <button
       onClick={onClick}
@@ -40,7 +40,11 @@ export function LevelButton({ preview, name, detail, stars, onClick, ...rest }) 
         <span className="printed text-2xl font-semibold">{name}</span>
         <span className="printed-soft text-base">{detail}</span>
         <span className="mt-1">
-          <Stars count={stars} size={22} />
+          {bestScore !== undefined ? (
+            <span className="best-chip">{bestScore > 0 ? `Best: ${bestScore}` : "No score yet"}</span>
+          ) : (
+            <Stars count={stars} size={22} />
+          )}
         </span>
       </span>
       <span className="play-badge sm:hidden" aria-hidden>
@@ -75,30 +79,75 @@ function makeConfetti() {
   }));
 }
 
+function Confetti() {
+  const [confetti] = useState(makeConfetti);
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+      {confetti.map((c) => (
+        <span
+          key={c.id}
+          className="confetti"
+          style={{
+            left: `${c.left}%`,
+            background: c.color,
+            "--dx": `${c.dx}px`,
+            "--rot": `${c.rot}deg`,
+            "--dur": `${c.dur}s`,
+            "--delay": `${c.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * End of an endless game: the score on a wooden plaque, the best score,
+ * and confetti only when it's a new best. `reason` explains why it ended.
+ */
+export function ScoreSheet({ score, best, isNew, reason, onReplay, onMenu }) {
+  return (
+    <div className="scrim fixed inset-0 z-20 flex items-end justify-center sm:items-center sm:p-4">
+      {isNew && <Confetti />}
+      <div role="dialog" aria-modal="true" aria-labelledby="score-title" className="paper sheet relative text-center">
+        <span className="sheet-handle" aria-hidden />
+        <div className="isolate inline-block">
+          <h2 id="score-title" className="ribbon text-3xl sm:text-4xl">
+            {isNew ? "New best!" : "Great try!"}
+          </h2>
+        </div>
+        {reason && <div className="mt-4 flex items-center justify-center gap-2">{reason}</div>}
+        <div className="my-5 flex flex-col items-center gap-2">
+          <span className="printed-soft label">Your score</span>
+          <span className="score-plaque score-plaque-big">
+            <span className="score-plaque-num">{score}</span>
+          </span>
+          <span className="printed text-lg font-medium">{isNew ? "That's your best ever!" : `Best: ${best}`}</span>
+        </div>
+        <div className="flex flex-col gap-4">
+          <button onClick={onReplay} className="btn w-full" autoFocus>
+            <ReplayIcon /> Play again
+          </button>
+          <button
+            onClick={onMenu}
+            className="printed-soft min-h-12 text-lg font-semibold underline decoration-2 underline-offset-4"
+          >
+            Back to menu
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /**
  * End-of-round celebration. Bottom sheet on phones, centred card on larger screens.
  * `next` is optional: { label, onClick } for the harder level.
  */
 export function WinSheet({ stars, summary, detail, next, onReplay, onMenu, menuLabel }) {
-  const [confetti] = useState(makeConfetti);
   return (
     <div className="scrim fixed inset-0 z-20 flex items-end justify-center sm:items-center sm:p-4">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
-        {confetti.map((c) => (
-          <span
-            key={c.id}
-            className="confetti"
-            style={{
-              left: `${c.left}%`,
-              background: c.color,
-              "--dx": `${c.dx}px`,
-              "--rot": `${c.rot}deg`,
-              "--dur": `${c.dur}s`,
-              "--delay": `${c.delay}s`,
-            }}
-          />
-        ))}
-      </div>
+      <Confetti />
       <div role="dialog" aria-modal="true" aria-labelledby="win-title" className="paper sheet relative text-center">
         <span className="sheet-handle" aria-hidden />
         <div className="isolate inline-block">
