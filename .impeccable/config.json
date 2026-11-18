@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-11-18T13:05:58.582Z",
+        "reason": "Claude triage: .mem-front uses a uniform 4px border on all four sides of the memory card face, not a one-sided accent tab"
+      }
+    ]
+  }
+}
