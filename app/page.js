@@ -4,6 +4,7 @@ import { PlayIcon } from "@/components/icons";
 import { CARD_SETS, CardFan } from "./games/memory/art";
 import { Bucket, ItemArt, makeItem } from "./games/colours/art";
 import { NumberBlock } from "./games/counting/art";
+import { Hole, Piece } from "./games/shapes/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -58,10 +59,37 @@ function CountingCover() {
   );
 }
 
+function ShapesCover() {
+  return (
+    <div className="absolute inset-x-[14%] top-[10%] bottom-[12%] flex flex-col items-center justify-between">
+      <span className="w-[22%] -rotate-12 drop-shadow-[0_8px_6px_rgba(0,0,0,0.4)]">
+        <Piece shape="star" paint="yellow" />
+      </span>
+      <span className="sorter-board grid w-[78%] grid-cols-3 gap-[6%] p-[5%]">
+        {[
+          ["circle", "blue"],
+          ["star", null],
+          ["heart", "red"],
+        ].map(([s, p]) => (
+          <span key={s} className="relative aspect-square">
+            <Hole shape={s} />
+            {p && (
+              <span className="absolute inset-0">
+                <Piece shape={s} paint={p} seated />
+              </span>
+            )}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
   { href: "/games/counting", title: "Counting", blurb: "Count the things and pick the right number.", Cover: CountingCover, btn: "btn-orange" },
+  { href: "/games/shapes", title: "Shape Sorter", blurb: "Fit each wooden shape into its hole.", Cover: ShapesCover, btn: "btn-red" },
 ];
 
 export default function Home() {
@@ -79,12 +107,12 @@ export default function Home() {
         <p className="engraved mt-5 text-xl font-medium sm:text-2xl">Pick a game and have fun!</p>
       </section>
 
-      <section aria-labelledby="games-heading" className="mx-auto w-full max-w-5xl">
+      <section aria-labelledby="games-heading" className="mx-auto w-full max-w-4xl">
         <h2 id="games-heading" className="sr-only">
           Games
         </h2>
 
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-5 sm:grid-cols-2">
           {GAMES.map(({ href, title, blurb, Cover, btn }) => (
             <li key={href}>
               <Link href={href} className="game-link block h-full rounded-[22px]">
