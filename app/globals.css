@@ -2414,6 +2414,79 @@ body {
   .riddle-choice[data-hint="true"] .riddle-choice-art {
     animation: hint 900ms ease-in-out infinite;
   }
+  /* Odd One Out: pictures shrink on short phones so all four and the Next button fit */
+  .odd-choice {
+    padding-bottom: 1.1rem;
+  }
+  .odd-choice .riddle-choice-art {
+    width: clamp(4.25rem, calc((100dvh - 29.5rem) / 2), 7.5rem);
+  }
+  /* Short phones: tighter question card so the pictures and Next button fit */
+  @media (max-height: 700px) {
+    .odd-top {
+      padding-block: 0.5rem 0.4rem;
+    }
+    .odd-card {
+      padding: 1.2rem 0.9rem 0.7rem 1rem;
+    }
+    .odd-card .printed {
+      font-size: 1.3rem;
+    }
+    .odd-card .printed-soft {
+      margin-top: 0.25rem;
+      font-size: 0.95rem;
+    }
+    .odd-card .knob {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+  .odd-clue {
+    display: inline-block;
+    padding: 0.1rem 0.7rem;
+    border-radius: 9999px;
+    color: #5a3a06;
+    font-weight: 700;
+    background: radial-gradient(circle at 40% 30%, #fff3b0, var(--gold-2) 75%);
+    box-shadow: 0 2px 0 #c98a14;
+    animation: stick 300ms cubic-bezier(0.34, 1.8, 0.5, 1) both;
+  }
+  /* After it's solved, the three that match share a green tag */
+  .odd-choice[data-group="true"] {
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -3px 0 var(--paper-edge),
+      0 0 0 3px #7fd394,
+      0 3px 0 #c9b28a,
+      0 8px 16px rgba(40, 18, 0, 0.3);
+  }
+  .odd-tag {
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    max-width: calc(100% + 0.5rem);
+    padding: 0.1rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
+    color: #fff;
+    background: radial-gradient(circle at 40% 30%, #6fd98a, var(--green) 70%);
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateX(-50%);
+    animation: odd-tag 360ms cubic-bezier(0.34, 1.7, 0.5, 1) both;
+    animation-delay: calc(var(--i) * 110ms + 200ms);
+  }
+  .odd-tag[data-odd="true"] {
+    color: #5a3a06;
+    background: radial-gradient(circle at 40% 30%, #fff3b0, var(--gold-2) 70%);
+  }
+  @keyframes odd-tag {
+    from { opacity: 0; transform: translateX(-50%) scale(0.4); }
+    to { opacity: 1; transform: translateX(-50%) scale(1); }
+  }
   .riddle-cross {
     position: absolute;
     top: -10px;

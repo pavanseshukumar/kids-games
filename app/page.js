@@ -16,6 +16,7 @@ import { ThingArt, Trophy } from "./games/riddles/art";
 import { CategoryArt } from "./games/alphabet/art";
 import { AnimalArt } from "./games/shadows/art";
 import { Magnifier, ThingIcon } from "./games/seek/art";
+import { ItemArt as OddItemArt } from "./games/oddone/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -321,6 +322,28 @@ function ShadowsCover() {
   );
 }
 
+function OddOneCover() {
+  const cards = [
+    ["apple", -8, false],
+    ["banana", 4, false],
+    ["carrot", -3, true],
+    ["mango", 7, false],
+  ];
+  return (
+    <div className="absolute inset-x-[6%] top-[16%] bottom-[16%] flex items-center justify-center gap-[3%]">
+      {cards.map(([id, r, odd]) => (
+        <span
+          key={id}
+          className="mini-card-front relative grid aspect-square w-[22%] place-items-center rounded-[10px] p-[2%]"
+          style={{ transform: `rotate(${r}deg) translateY(${odd ? "-10%" : "0"})`, boxShadow: odd ? "0 0 0 3px #F7C948, 0 6px 10px rgba(0,0,0,0.35)" : undefined }}
+        >
+          <OddItemArt id={id} />
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function SeekCover() {
   const bits = [
     ["star", "#F8C630", 12, 18, -12],
@@ -362,6 +385,7 @@ const GAMES = [
   { href: "/games/alphabet", title: "Alphabet Speed", blurb: "Name an animal, fruit, place and thing for the letter. Quick, 30 seconds!", Cover: AlphabetCover, btn: "btn-blue" },
   { href: "/games/shadows", title: "Shadow Animals", blurb: "Whose shadow is it? Guess the animal, with clues to help.", Cover: ShadowsCover, btn: "btn-red" },
   { href: "/games/seek", title: "Find It Fast", blurb: "Spot the stars, birds and more in the busy picture. 60 seconds!", Cover: SeekCover, btn: "btn-orange" },
+  { href: "/games/oddone", title: "Odd One Out", blurb: "Three go together. Find the one that doesn't belong!", Cover: OddOneCover, btn: "btn-blue" },
 ];
 
 export default function Home() {
