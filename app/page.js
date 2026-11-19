@@ -12,6 +12,7 @@ import { Carriage, Engine, Station, Tree } from "./games/train/art";
 import { Chute, Cup, Marble, Ramp } from "./games/marble/art";
 import { MiniTray, PictureLibrary } from "./games/puzzle/art";
 import { Scoop, ScooperBack, ScooperFront, TowerArt } from "./games/icecream/art";
+import { ThingArt, Trophy } from "./games/riddles/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -252,6 +253,27 @@ function IceCreamCover() {
   );
 }
 
+function RiddlesCover() {
+  return (
+    <div className="absolute inset-x-[8%] top-[12%] bottom-[10%] flex flex-col items-center justify-between">
+      <span className="paper -rotate-2 px-[5%] py-[3%] text-center">
+        <span className="printed block text-[clamp(0.8rem,3.6vw,1.15rem)] leading-tight font-semibold">“I have hands but cannot clap.”</span>
+      </span>
+      <span className="flex w-full items-end justify-center gap-[5%]">
+        <span className="mini-card-front grid aspect-square w-[24%] -rotate-6 place-items-center rounded-[10px] p-[2%] opacity-90">
+          <ThingArt id="glove" />
+        </span>
+        <span className="w-[22%] drop-shadow-[0_6px_5px_rgba(0,0,0,0.4)]">
+          <Trophy />
+        </span>
+        <span className="mini-card-front grid aspect-square w-[24%] rotate-6 place-items-center rounded-[10px] p-[2%]">
+          <ThingArt id="clock" />
+        </span>
+      </span>
+    </div>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
@@ -264,6 +286,7 @@ const GAMES = [
   { href: "/games/marble", title: "Marble Run", blurb: "Flip the ramps and roll the marble into the cup.", Cover: MarbleCover, btn: "btn-orange" },
   { href: "/games/puzzle", title: "Sliding Puzzle", blurb: "Slide the tiles to fix the picture.", Cover: PuzzleCover, btn: "btn-blue" },
   { href: "/games/icecream", title: "Ice Cream Stack", blurb: "Drop the scoops. How tall can it get?", Cover: IceCreamCover, btn: "btn-red" },
+  { href: "/games/riddles", title: "Riddle Champion", blurb: "Listen to the riddle and guess what it is!", Cover: RiddlesCover, btn: "btn-orange" },
 ];
 
 export default function Home() {
