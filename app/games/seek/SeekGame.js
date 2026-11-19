@@ -283,7 +283,7 @@ export default function SeekGame() {
 
         {/* The busy picture */}
         <div className="seek-frame relative w-full">
-          <svg key={pictures} viewBox={`0 0 ${SIZE} ${SIZE}`} className="seek-scene block h-auto w-full" data-phase={phase} role="group" aria-label="Busy picture">
+          <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="seek-scene block h-auto w-full" data-phase={phase} role="group" aria-label="Busy picture">
             <ParkBackdrop />
             {scene.items.map((it) => {
               const isFound = found.includes(it.key);
