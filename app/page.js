@@ -10,6 +10,7 @@ import { Balloon } from "./games/balloons/art";
 import { FlowerPot, Pipe, Tap } from "./games/water/art";
 import { Carriage, Engine, Station, Tree } from "./games/train/art";
 import { Chute, Cup, Marble, Ramp } from "./games/marble/art";
+import { MiniTray, PictureLibrary } from "./games/puzzle/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -222,6 +223,16 @@ function MarbleCover() {
   );
 }
 
+function PuzzleCover() {
+  return (
+    <div className="absolute inset-[8%] flex justify-center">
+      <span className="block aspect-square h-full -rotate-3 drop-shadow-[0_6px_6px_rgba(0,0,0,0.4)]">
+        <MiniTray picture="train" n={3} order={[0, 1, 2, 3, 4, 8, 6, 7, 5]} />
+      </span>
+    </div>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
@@ -232,11 +243,13 @@ const GAMES = [
   { href: "/games/water", title: "Water Flow", blurb: "Turn the pipes to water the flower.", Cover: WaterCover, btn: "btn-blue" },
   { href: "/games/train", title: "Train Track", blurb: "Draw a track and drive the train home.", Cover: TrainCover, btn: "btn-red" },
   { href: "/games/marble", title: "Marble Run", blurb: "Flip the ramps and roll the marble into the cup.", Cover: MarbleCover, btn: "btn-orange" },
+  { href: "/games/puzzle", title: "Sliding Puzzle", blurb: "Slide the tiles to fix the picture.", Cover: PuzzleCover, btn: "btn-blue" },
 ];
 
 export default function Home() {
   return (
     <main className="screen">
+      <PictureLibrary />
       <AppBar right={<SoundButton />} />
 
       {/* Hanging sign */}

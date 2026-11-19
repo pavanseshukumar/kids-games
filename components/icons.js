@@ -91,6 +91,15 @@ export function LockIcon(props) {
   );
 }
 
+export function BulbIcon(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M9 17.5h6M10 21h4" />
+      <path d="M8.5 14.5a6 6 0 1 1 7 0c-.6.5-1 1.2-1 2v1h-5v-1c0-.8-.4-1.5-1-2Z" fill="currentColor" fillOpacity="0.25" />
+    </svg>
+  );
+}
+
 const STAR = "32,5 40.2,22.7 59.6,24.9 45.2,38.1 49.1,57.2 32,47.5 14.9,57.2 18.8,38.1 4.4,24.9 23.8,22.7";
 
 /** Polished gold star, or an empty pressed-in slot when `on` is false. */

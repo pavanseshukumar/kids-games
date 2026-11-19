@@ -70,6 +70,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Lets the gap between puzzle tiles animate closed */
+@property --gap {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 5px;
+}
+
 @layer components {
   /* =========================================================
      Layout
@@ -1785,6 +1792,147 @@ body {
   }
   .marble-cup[data-full="true"] {
     filter: drop-shadow(0 0 14px rgba(255, 236, 160, 1));
+  }
+
+  /* =========================================================
+     Sliding Puzzle
+     ========================================================= */
+  /* Wooden tray with a sunken well that holds the tiles */
+  .slide-tray {
+    padding: 0.7rem;
+    border-radius: 20px;
+    background: var(--tex-grain), linear-gradient(160deg, #d99a58, #a8682f);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 230, 190, 0.55),
+      inset 0 -4px 0 rgba(70, 35, 8, 0.4),
+      0 4px 0 #6e4322,
+      0 16px 26px rgba(40, 18, 0, 0.5);
+  }
+  .slide-tray[data-done="true"] {
+    animation: board-done 600ms cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
+  .slide-well {
+    --gap: 5px;
+    --inset: 5px;
+    --board: min(calc(100vw - 3.4rem), 25rem, calc(100dvh - 20rem));
+    --t: calc((100% - 2 * var(--inset) - (var(--n) - 1) * var(--gap)) / var(--n));
+    position: relative;
+    width: var(--board);
+    min-width: 14rem;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    background: var(--tex-grain), linear-gradient(180deg, #3b210f, #5a3418);
+    box-shadow:
+      inset 0 4px 8px rgba(0, 0, 0, 0.6),
+      inset 0 -1px 0 rgba(255, 220, 170, 0.25);
+    transition: --gap 450ms ease;
+  }
+  /* The finished picture: tiles close up into one */
+  .slide-well[data-whole="true"] {
+    --gap: 0px;
+  }
+  .slide-tile {
+    position: absolute;
+    top: var(--inset);
+    left: var(--inset);
+    width: var(--t);
+    height: var(--t);
+    padding: 0;
+    border-radius: 9px;
+    transform: translate(calc(var(--c) * (100% + var(--gap))), calc(var(--r) * (100% + var(--gap))));
+    transition:
+      transform 170ms cubic-bezier(0.3, 0.9, 0.4, 1),
+      border-radius 450ms ease,
+      box-shadow 450ms ease,
+      opacity 300ms ease;
+    box-shadow:
+      0 3px 0 #2a1508,
+      0 5px 8px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    touch-action: none;
+  }
+  .slide-face {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+  /* Bevelled edge of each wooden tile */
+  .slide-face::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.55),
+      inset 2px 0 0 rgba(255, 255, 255, 0.25),
+      inset 0 -3px 0 rgba(40, 18, 0, 0.3),
+      inset 0 0 0 1.5px rgba(60, 30, 10, 0.45);
+    transition: opacity 450ms ease;
+    pointer-events: none;
+  }
+  .slide-well[data-whole="true"] .slide-tile {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .slide-well[data-whole="true"] .slide-face::after {
+    opacity: 0;
+  }
+  /* Gap tile: out of the tray while you play, slides back in when it's fixed */
+  .slide-tile[data-gap="true"] {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(calc(var(--c) * (100% + var(--gap))), calc(var(--r) * (100% + var(--gap)))) scale(0.8);
+  }
+  .slide-well[data-whole="true"] .slide-tile[data-gap="true"] {
+    opacity: 1;
+    transform: translate(calc(var(--c) * (100% + var(--gap))), calc(var(--r) * (100% + var(--gap))));
+    transition-duration: 170ms, 450ms, 450ms, 300ms;
+  }
+  .slide-well[data-phase="mix"] .slide-tile {
+    transition-duration: 90ms, 450ms, 450ms, 300ms;
+  }
+  .slide-well[data-phase="solved"] {
+    box-shadow:
+      inset 0 4px 8px rgba(0, 0, 0, 0.6),
+      0 0 0 3px rgba(255, 236, 160, 0.9),
+      0 0 22px rgba(255, 236, 160, 0.9);
+  }
+  .slide-tile[data-hint="true"] {
+    z-index: 1;
+    animation: tile-hint 1s ease-in-out infinite;
+  }
+  @keyframes tile-hint {
+    0%, 100% { box-shadow: 0 3px 0 #2a1508, 0 0 0 0 rgba(255, 236, 160, 0); }
+    50% { box-shadow: 0 3px 0 #2a1508, 0 0 0 5px #ffe066, 0 0 24px 8px rgba(255, 236, 160, 1); }
+  }
+  .slide-tile[data-hint="true"] .slide-face {
+    animation: tile-hint-bob 1s ease-in-out infinite;
+  }
+  @keyframes tile-hint-bob {
+    0%, 100% { filter: none; }
+    50% { filter: brightness(1.18); }
+  }
+  .slide-tile:focus-visible {
+    outline: 3px solid var(--yellow);
+    outline-offset: 2px;
+    z-index: 2;
+  }
+  /* The finished picture, taped to the table like a puzzle-box lid */
+  .lid-card {
+    padding: 0.45rem;
+    border-radius: 10px;
+    transform: rotate(-3deg);
+  }
+  .lid-pic {
+    display: block;
+    width: 5.25rem;
+    height: 5.25rem;
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgba(60, 30, 10, 0.25);
   }
 
   /* The pinned rule card */
