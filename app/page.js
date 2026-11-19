@@ -15,6 +15,7 @@ import { Scoop, ScooperBack, ScooperFront, TowerArt } from "./games/icecream/art
 import { ThingArt, Trophy } from "./games/riddles/art";
 import { CategoryArt } from "./games/alphabet/art";
 import { AnimalArt } from "./games/shadows/art";
+import { Magnifier, ThingIcon } from "./games/seek/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -320,6 +321,31 @@ function ShadowsCover() {
   );
 }
 
+function SeekCover() {
+  const bits = [
+    ["star", "#F8C630", 12, 18, -12],
+    ["bird", "#3A8DE6", 32, 52, 6],
+    ["umbrella", "#E5483B", 70, 16, 10],
+    ["balloon", "#9B6BE0", 50, 12, -6],
+    ["flower", "#F2709C", 14, 62, 0],
+    ["star", "#F59A2E", 82, 58, 18],
+    ["kite", "#3FB35F", 60, 50, -10],
+    ["heart", "#E5483B", 30, 20, 8],
+  ];
+  return (
+    <div className="absolute inset-[8%] overflow-hidden rounded-[12px] bg-gradient-to-b from-[#8FCBF5] to-[#A8DC86]">
+      {bits.map(([id, c, x, y, r], i) => (
+        <span key={i} className="absolute w-[15%]" style={{ left: `${x}%`, top: `${y}%`, transform: `rotate(${r}deg)` }}>
+          <ThingIcon id={id} colour={c} />
+        </span>
+      ))}
+      <span className="absolute right-[6%] bottom-[4%] w-[30%] rotate-[-8deg] drop-shadow-[0_6px_5px_rgba(0,0,0,0.4)]">
+        <Magnifier />
+      </span>
+    </div>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
@@ -335,6 +361,7 @@ const GAMES = [
   { href: "/games/riddles", title: "Riddle Champion", blurb: "Listen to the riddle and guess what it is!", Cover: RiddlesCover, btn: "btn-orange" },
   { href: "/games/alphabet", title: "Alphabet Speed", blurb: "Name an animal, fruit, place and thing for the letter. Quick, 30 seconds!", Cover: AlphabetCover, btn: "btn-blue" },
   { href: "/games/shadows", title: "Shadow Animals", blurb: "Whose shadow is it? Guess the animal, with clues to help.", Cover: ShadowsCover, btn: "btn-red" },
+  { href: "/games/seek", title: "Find It Fast", blurb: "Spot the stars, birds and more in the busy picture. 60 seconds!", Cover: SeekCover, btn: "btn-orange" },
 ];
 
 export default function Home() {
