@@ -14,6 +14,7 @@ import { MiniTray, PictureLibrary } from "./games/puzzle/art";
 import { Scoop, ScooperBack, ScooperFront, TowerArt } from "./games/icecream/art";
 import { ThingArt, Trophy } from "./games/riddles/art";
 import { CategoryArt } from "./games/alphabet/art";
+import { AnimalArt } from "./games/shadows/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -299,6 +300,26 @@ function AlphabetCover() {
   );
 }
 
+function ShadowsCover() {
+  return (
+    <div className="absolute inset-[9%] flex items-center justify-center">
+      <span className="shadow-stage block w-[78%] !p-[2.5%]">
+        <span className="shadow-screen relative flex aspect-[2/1] items-end justify-center gap-[2%] rounded-[10px] px-[8%] pt-[6%] pb-[3%]">
+          <span className="w-[34%]">
+            <AnimalArt id="elephant" shadow />
+          </span>
+          <span className="w-[30%]">
+            <AnimalArt id="giraffe" shadow />
+          </span>
+          <span className="absolute top-[8%] right-[6%] grid size-7 place-items-center rounded-full border-2 border-white bg-[#F8C630] text-base font-bold text-[#8a4b00] shadow">
+            ?
+          </span>
+        </span>
+      </span>
+    </div>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
@@ -313,6 +334,7 @@ const GAMES = [
   { href: "/games/icecream", title: "Ice Cream Stack", blurb: "Drop the scoops. How tall can it get?", Cover: IceCreamCover, btn: "btn-red" },
   { href: "/games/riddles", title: "Riddle Champion", blurb: "Listen to the riddle and guess what it is!", Cover: RiddlesCover, btn: "btn-orange" },
   { href: "/games/alphabet", title: "Alphabet Speed", blurb: "Name an animal, fruit, place and thing for the letter. Quick, 30 seconds!", Cover: AlphabetCover, btn: "btn-blue" },
+  { href: "/games/shadows", title: "Shadow Animals", blurb: "Whose shadow is it? Guess the animal, with clues to help.", Cover: ShadowsCover, btn: "btn-red" },
 ];
 
 export default function Home() {
