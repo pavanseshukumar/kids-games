@@ -13,6 +13,7 @@ import { Chute, Cup, Marble, Ramp } from "./games/marble/art";
 import { MiniTray, PictureLibrary } from "./games/puzzle/art";
 import { Scoop, ScooperBack, ScooperFront, TowerArt } from "./games/icecream/art";
 import { ThingArt, Trophy } from "./games/riddles/art";
+import { CategoryArt } from "./games/alphabet/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -274,6 +275,30 @@ function RiddlesCover() {
   );
 }
 
+function AlphabetCover() {
+  return (
+    <div className="absolute inset-x-[8%] top-[10%] bottom-[10%] flex items-center justify-between gap-[4%]">
+      <span className="alpha-dial !w-[34%] shrink-0" data-phase="cover">
+        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden>
+          <circle cx="50" cy="50" r="45" className="alpha-dial-track" />
+          <circle cx="50" cy="50" r="45" pathLength="100" className="alpha-dial-ring" style={{ strokeDashoffset: 35 }} />
+        </svg>
+        <span className="alpha-letter">
+          <NumberBlock value="B" paint="blue" />
+        </span>
+      </span>
+      <span className="grid flex-1 grid-cols-2 gap-[6%]">
+        {["animal", "fruit", "place", "object"].map((c, i) => (
+          <span key={c} className="mini-card-front relative grid aspect-square place-items-center rounded-[10px] p-[12%]" style={{ transform: `rotate(${[-4, 3, 2, -3][i]}deg)` }}>
+            <CategoryArt id={c} />
+            {i < 2 && <span className="absolute -top-1.5 -right-1.5 grid size-5 place-items-center rounded-full border-2 border-white bg-[#3FB35F] text-[0.65rem] font-bold text-white">✓</span>}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
@@ -287,6 +312,7 @@ const GAMES = [
   { href: "/games/puzzle", title: "Sliding Puzzle", blurb: "Slide the tiles to fix the picture.", Cover: PuzzleCover, btn: "btn-blue" },
   { href: "/games/icecream", title: "Ice Cream Stack", blurb: "Drop the scoops. How tall can it get?", Cover: IceCreamCover, btn: "btn-red" },
   { href: "/games/riddles", title: "Riddle Champion", blurb: "Listen to the riddle and guess what it is!", Cover: RiddlesCover, btn: "btn-orange" },
+  { href: "/games/alphabet", title: "Alphabet Speed", blurb: "Name an animal, fruit, place and thing for the letter. Quick, 30 seconds!", Cover: AlphabetCover, btn: "btn-blue" },
 ];
 
 export default function Home() {
