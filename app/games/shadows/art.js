@@ -529,12 +529,3 @@ export function AnimalArt({ id, shadow = false, className = "h-full w-full" }) {
     </svg>
   );
 }
-
-/** Menu preview: a little lit screen with one shadow on it. */
-export function ShadowPreview({ id }) {
-  return (
-    <span className="shadow-screen relative grid size-[60px] shrink-0 place-items-center overflow-hidden rounded-[12px] p-1.5" aria-hidden>
-      <AnimalArt id={id} shadow />
-    </span>
-  );
-}

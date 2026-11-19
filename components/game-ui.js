@@ -105,7 +105,7 @@ function Confetti() {
  * End of an endless game: the score on a wooden plaque, the best score,
  * and confetti only when it's a new best. `reason` explains why it ended.
  */
-export function ScoreSheet({ score, best, isNew, reason, onReplay, onMenu }) {
+export function ScoreSheet({ score, best, isNew, reason, onReplay, onMenu, menuLabel = "Back to menu" }) {
   return (
     <div className="scrim fixed inset-0 z-20 flex items-end justify-center sm:items-center sm:p-4">
       {isNew && <Confetti />}
@@ -132,7 +132,7 @@ export function ScoreSheet({ score, best, isNew, reason, onReplay, onMenu }) {
             onClick={onMenu}
             className="printed-soft min-h-12 text-lg font-semibold underline decoration-2 underline-offset-4"
           >
-            Back to menu
+            {menuLabel}
           </button>
         </div>
       </div>
