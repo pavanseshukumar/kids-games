@@ -1935,6 +1935,77 @@ body {
     box-shadow: inset 0 0 0 1px rgba(60, 30, 10, 0.25);
   }
 
+  /* =========================================================
+     Ice Cream Stack
+     ========================================================= */
+  /* Wooden shop-window frame with a striped awning across the top */
+  .parlour-frame {
+    position: relative;
+    border-radius: 18px;
+    padding: 10px;
+    background: var(--tex-grain), linear-gradient(160deg, #d79c62, #a8693a);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 235, 200, 0.5),
+      inset 0 -3px 0 rgba(90, 45, 10, 0.4),
+      0 4px 0 #7a4a22,
+      0 14px 24px rgba(40, 18, 0, 0.45);
+  }
+  .parlour-frame > svg {
+    border-radius: 10px;
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    outline: none;
+  }
+  .parlour-frame > svg:focus-visible {
+    box-shadow: 0 0 0 3px var(--yellow);
+  }
+  .ic-rail {
+    transition: opacity 400ms ease;
+  }
+  .ic-rail[data-hide="true"] {
+    opacity: 0;
+  }
+  .ic-aim {
+    transition: opacity 150ms ease;
+  }
+  .scoop-squish {
+    transform-box: fill-box;
+    transform-origin: 50% 90%;
+  }
+  .scoop-land .scoop-squish {
+    animation: scoop-squish 320ms cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
+  @keyframes scoop-squish {
+    0% { scale: 1.12 0.82; }
+    60% { scale: 0.96 1.06; }
+    100% { scale: 1; }
+  }
+  .scoop-load {
+    animation: scoop-load 220ms cubic-bezier(0.34, 1.6, 0.5, 1);
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+  }
+  @keyframes scoop-load {
+    from { scale: 0.4; opacity: 0; }
+    to { scale: 1; opacity: 1; }
+  }
+  .splat-in {
+    animation: splat-in 260ms cubic-bezier(0.2, 1.4, 0.5, 1) both;
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+  @keyframes splat-in {
+    from { scale: 0.3 1.6; }
+    to { scale: 1; }
+  }
+  .cherry-in {
+    animation: cherry-in 500ms cubic-bezier(0.34, 1.6, 0.5, 1) both;
+  }
+  @keyframes cherry-in {
+    from { opacity: 0; translate: 0 -60px; }
+    to { opacity: 1; translate: 0 0; }
+  }
+
   /* The pinned rule card */
   .rule-card {
     display: inline-flex;

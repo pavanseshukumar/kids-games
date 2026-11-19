@@ -11,6 +11,7 @@ import { FlowerPot, Pipe, Tap } from "./games/water/art";
 import { Carriage, Engine, Station, Tree } from "./games/train/art";
 import { Chute, Cup, Marble, Ramp } from "./games/marble/art";
 import { MiniTray, PictureLibrary } from "./games/puzzle/art";
+import { Scoop, ScooperBack, ScooperFront, TowerArt } from "./games/icecream/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -233,6 +234,24 @@ function PuzzleCover() {
   );
 }
 
+function IceCreamCover() {
+  return (
+    <svg viewBox="0 0 400 250" className="absolute inset-[4%] h-[92%] w-[92%]" aria-hidden>
+      <rect x="-20" y="22" width="440" height="8" rx="4" fill="#AEB4BB" stroke="#3D2A1E" strokeWidth="2.5" />
+      <g transform="translate(262 26)">
+        <ScooperBack />
+        <g transform="translate(0 58)">
+          <Scoop flavour="blueberry" />
+        </g>
+        <ScooperFront />
+      </g>
+      <g transform="translate(150 160) scale(0.8)">
+        <TowerArt flavours={["strawberry", "mint", "chocolate", "lemon"]} />
+      </g>
+    </svg>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
@@ -244,6 +263,7 @@ const GAMES = [
   { href: "/games/train", title: "Train Track", blurb: "Draw a track and drive the train home.", Cover: TrainCover, btn: "btn-red" },
   { href: "/games/marble", title: "Marble Run", blurb: "Flip the ramps and roll the marble into the cup.", Cover: MarbleCover, btn: "btn-orange" },
   { href: "/games/puzzle", title: "Sliding Puzzle", blurb: "Slide the tiles to fix the picture.", Cover: PuzzleCover, btn: "btn-blue" },
+  { href: "/games/icecream", title: "Ice Cream Stack", blurb: "Drop the scoops. How tall can it get?", Cover: IceCreamCover, btn: "btn-red" },
 ];
 
 export default function Home() {
@@ -256,7 +276,7 @@ export default function Home() {
       <section className="flex flex-col items-center pt-2 pb-8 sm:pt-4 sm:pb-12">
         <div className="sway ropes">
           <div className="sign">
-            <h1 className="toy-title px-4 text-5xl sm:text-7xl">Play Time</h1>
+            <h1 className="toy-title px-4 text-4xl sm:text-7xl">Play Time</h1>
           </div>
         </div>
         <p className="engraved mt-5 text-xl font-medium sm:text-2xl">Pick a game and have fun!</p>
