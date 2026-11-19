@@ -9,6 +9,7 @@ import { Bead } from "./games/patterns/art";
 import { Balloon } from "./games/balloons/art";
 import { FlowerPot, Pipe, Tap } from "./games/water/art";
 import { Carriage, Engine, Station, Tree } from "./games/train/art";
+import { Chute, Cup, Marble, Ramp } from "./games/marble/art";
 
 const STAR = makeItem("star", "red");
 const BALLOON = makeItem("balloon", "blue");
@@ -192,6 +193,35 @@ function PatternsCover() {
   );
 }
 
+function MarbleCover() {
+  return (
+    <svg viewBox="0 0 400 250" className="absolute inset-[6%] h-[88%] w-[88%]" aria-hidden>
+      <rect x="40" y="0" width="320" height="250" rx="24" fill="#E2B784" stroke="#9C6A3C" strokeWidth="6" />
+      {Array.from({ length: 12 }, (_, i) => (
+        <circle key={i} cx={90 + (i % 4) * 75} cy={60 + Math.floor(i / 4) * 70} r="5" fill="#6E4322" opacity="0.5" />
+      ))}
+      <g transform="translate(130 35)">
+        <Chute />
+      </g>
+      <g transform="translate(150 95)">
+        <Ramp dir={1} paint={0} />
+      </g>
+      <g transform="translate(250 145)">
+        <Ramp dir={-1} locked />
+      </g>
+      <g transform="translate(150 185)">
+        <Ramp dir={1} paint={1} />
+      </g>
+      <g transform="translate(184 74)">
+        <Marble />
+      </g>
+      <g transform="translate(270 205) scale(0.7)">
+        <Cup />
+      </g>
+    </svg>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
@@ -201,6 +231,7 @@ const GAMES = [
   { href: "/games/balloons", title: "Pop the Balloons", blurb: "Pop only the balloons the card asks for.", Cover: BalloonsCover, btn: "btn-orange" },
   { href: "/games/water", title: "Water Flow", blurb: "Turn the pipes to water the flower.", Cover: WaterCover, btn: "btn-blue" },
   { href: "/games/train", title: "Train Track", blurb: "Draw a track and drive the train home.", Cover: TrainCover, btn: "btn-red" },
+  { href: "/games/marble", title: "Marble Run", blurb: "Flip the ramps and roll the marble into the cup.", Cover: MarbleCover, btn: "btn-orange" },
 ];
 
 export default function Home() {
