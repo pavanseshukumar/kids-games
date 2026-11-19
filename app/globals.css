@@ -2024,6 +2024,128 @@ body {
   }
 
   /* =========================================================
+     Alphabet Speed Challenge
+     ========================================================= */
+  /* Kitchen-timer dial: a ring that drains around the letter block */
+  .alpha-dial {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 9.5rem;
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 50% 35%, #fffdf5, #efe2c4 70%);
+    box-shadow:
+      inset 0 2px 1px #fff,
+      inset 0 -3px 0 rgba(120, 80, 30, 0.18),
+      0 5px 0 #b99b6a,
+      0 10px 18px rgba(40, 18, 0, 0.4);
+  }
+  .alpha-dial-track,
+  .alpha-dial-ring {
+    fill: none;
+    stroke-width: 7;
+  }
+  .alpha-dial-track {
+    stroke: rgba(120, 80, 30, 0.15);
+  }
+  .alpha-dial-ring {
+    stroke: var(--green);
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+    transition: stroke 300ms ease;
+  }
+  .alpha-dial[data-phase="play"] .alpha-dial-ring,
+  .alpha-dial[data-phase="result"] .alpha-dial-ring {
+    animation: dial-drain var(--secs) linear forwards;
+  }
+  .alpha-dial[data-phase="result"] .alpha-dial-ring {
+    animation-play-state: paused;
+  }
+  .alpha-dial[data-low="true"] .alpha-dial-ring {
+    stroke: var(--red);
+  }
+  @keyframes dial-drain {
+    to { stroke-dashoffset: 100; }
+  }
+  .alpha-letter {
+    display: block;
+    width: 62%;
+    filter: drop-shadow(0 5px 4px rgba(40, 18, 0, 0.4));
+  }
+  .alpha-land {
+    animation: block-yes 600ms cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
+  .alpha-dial[data-low="true"] .alpha-letter {
+    animation: alpha-hurry 500ms ease-in-out infinite;
+  }
+  @keyframes alpha-hurry {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg) scale(1.04); }
+  }
+  /* 3-2-1 bubble */
+  .alpha-count {
+    position: absolute;
+    top: -0.6rem;
+    right: -0.6rem;
+    display: grid;
+    place-items: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 9999px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #8a4b00;
+    background: linear-gradient(180deg, #fff3a6, var(--yellow));
+    border: 4px solid #fff;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.35);
+    animation: stick 320ms cubic-bezier(0.34, 1.8, 0.5, 1) both;
+  }
+  .score-plaque[data-low="true"] .alpha-secs {
+    color: #ffd7d2;
+  }
+
+  .alpha-card {
+    transition: transform 140ms cubic-bezier(0.34, 1.5, 0.5, 1), box-shadow 140ms ease, opacity 220ms ease;
+  }
+  .alpha-card[data-live="false"] {
+    opacity: 0.6;
+  }
+  .alpha-card-art {
+    display: block;
+    width: min(100%, 4.75rem);
+    aspect-ratio: 1;
+    margin-bottom: 0.25rem;
+  }
+  .alpha-card[aria-pressed="true"] .alpha-card-art {
+    animation: block-yes 600ms cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
+  .alpha-card-foot {
+    min-height: 1.5rem;
+    line-height: 1.25;
+  }
+  .alpha-idea {
+    animation: fade-in 300ms ease both;
+  }
+  .alpha-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    padding: 0.15rem 0.7rem;
+    border-radius: 9999px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: #fff;
+    box-shadow: inset 0 -2px 0 var(--paper-edge), 0 2px 4px rgba(40, 18, 0, 0.25);
+  }
+  .alpha-chip small {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  /* =========================================================
      Riddle Champion
      ========================================================= */
   .riddle-card {
