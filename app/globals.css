@@ -2023,6 +2023,93 @@ body {
     animation: pop-in 420ms cubic-bezier(0.34, 1.5, 0.5, 1) both;
   }
 
+  /* =========================================================
+     Riddle Champion
+     ========================================================= */
+  .riddle-card {
+    padding: 1.6rem 1.1rem 1.1rem 1.3rem;
+    transform: rotate(-1deg);
+    animation: riddle-in 460ms cubic-bezier(0.34, 1.4, 0.5, 1) both;
+  }
+  @keyframes riddle-in {
+    from { opacity: 0; transform: translateY(-30px) rotate(-6deg) scale(0.9); }
+    to { opacity: 1; transform: rotate(-1deg); }
+  }
+  .riddle-card[data-solved="true"] {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.9) inset,
+      0 -2px 0 var(--paper-edge) inset,
+      0 0 0 4px var(--gold-2),
+      0 0 0 6px rgba(150, 95, 10, 0.5),
+      0 10px 22px rgba(40, 18, 0, 0.35);
+  }
+  .riddle-reveal {
+    filter: drop-shadow(0 4px 3px rgba(40, 18, 0, 0.35));
+    animation: riddle-reveal 620ms cubic-bezier(0.34, 1.7, 0.5, 1) both;
+  }
+  @keyframes riddle-reveal {
+    0% { opacity: 0; transform: scale(0.2) rotate(-30deg); }
+    100% { opacity: 1; transform: none; }
+  }
+  /* The answer comes alive: the clock's hands whizz round */
+  .clock-hand {
+    transform-origin: 50px 54px;
+  }
+  .riddle-reveal .clock-hand-minute {
+    animation: clock-spin 1.4s cubic-bezier(0.3, 0, 0.3, 1) 300ms both;
+  }
+  .riddle-reveal .clock-hand-hour {
+    animation: clock-spin 1.4s cubic-bezier(0.3, 0, 0.3, 1) 300ms both reverse;
+  }
+  @keyframes clock-spin {
+    from { transform: rotate(0); }
+    to { transform: rotate(720deg); }
+  }
+
+  .riddle-choice {
+    transition: transform 140ms cubic-bezier(0.34, 1.5, 0.5, 1), box-shadow 140ms ease, opacity 220ms ease, filter 220ms ease;
+  }
+  .riddle-choice-art {
+    display: block;
+    width: min(100%, 7.5rem);
+    aspect-ratio: 1;
+    padding: 0.35rem;
+  }
+  .riddle-choice[data-wrong="true"] {
+    opacity: 0.5;
+    filter: grayscale(0.85);
+    cursor: default;
+  }
+  .riddle-choice[data-wrong="true"]:active {
+    transform: none;
+  }
+  .riddle-choice[data-dim="true"] {
+    opacity: 0.4;
+  }
+  .riddle-choice[data-right="true"] {
+    animation: block-yes 600ms cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
+  .riddle-choice[data-hint="true"] .riddle-choice-art {
+    animation: hint 900ms ease-in-out infinite;
+  }
+  .riddle-cross {
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    background: radial-gradient(circle at 40% 30%, #ff8c7e, var(--red) 65%);
+    border: 3px solid #fff;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
+    animation: stick 300ms cubic-bezier(0.34, 1.8, 0.5, 1) both;
+  }
+
   /* ---------- Larger screens ---------- */
   @media (min-width: 640px) {
     .sheet {
