@@ -12,9 +12,10 @@ const GAME = "numbers";
 const PEEK_MS = 900; // how long a wrong tile stays open before it flips back
 
 const LEVELS = [
-  { id: "3", size: 3, name: "Small", detail: "3 × 3 · 1 to 9" },
-  { id: "4", size: 4, name: "Medium", detail: "4 × 4 · 1 to 16" },
-  { id: "5", size: 5, name: "Big", detail: "5 × 5 · 1 to 25" },
+  // `look`: seconds every number is shown after the shuffle, before the tiles close
+  { id: "3", size: 3, look: 3, name: "Small", detail: "3 × 3 · 1 to 9" },
+  { id: "4", size: 4, look: 5, name: "Medium", detail: "4 × 4 · 1 to 16" },
+  { id: "5", size: 5, look: 7, name: "Big", detail: "5 × 5 · 1 to 25" },
 ];
 
 const CHEERS = ["Super!", "Fast fingers!", "Keep going!", "Great!", "Yes!"];
@@ -33,12 +34,13 @@ const now = () => Date.now();
 const fmt = (tenths) => (tenths / 10).toFixed(1);
 
 /**
- * Every wrong flip shows where a number is, so a child with a perfect memory still
- * makes up to (tiles - 1) wrong flips. Stars allow for that.
+ * Children see every number before the tiles close, so a few slips are normal
+ * on bigger grids. Stars scale with the grid: on 4 × 4, up to 3 wrong flips is
+ * 3 stars and up to 10 is 2.
  */
 function starsFor(wrong, cells) {
-  if (wrong <= Math.round(cells * 0.6)) return 3;
-  if (wrong <= Math.round(cells * 1.2)) return 2;
+  if (wrong <= Math.round(cells * 0.2)) return 3;
+  if (wrong <= Math.round(cells * 0.6)) return 2;
   return 1;
 }
 
@@ -66,6 +68,7 @@ export default function NumbersGame() {
   const [mistakes, setMistakes] = useState(0);
   const [nope, setNope] = useState(null); // { n, id } for a wrong tap
   const [peek, setPeek] = useState(null); // a wrong tile showing its number for a moment
+  const [look, setLook] = useState(null); // seconds left to memorise, while every number shows
   const [tenths, setTenths] = useState(0);
   const [running, setRunning] = useState(false);
   const [cheer, setCheer] = useState(null);
@@ -76,6 +79,7 @@ export default function NumbersGame() {
   const level = LEVELS.find((l) => l.id === levelId);
   const startAt = useRef(0);
   const peekTimer = useRef(null);
+  const lookEnd = useRef(0);
   const ids = useRef(0);
   const nextId = () => ++ids.current;
 
@@ -86,6 +90,29 @@ export default function NumbersGame() {
     },
     []
   );
+
+  /* Memorise time: count down, then close every tile at once. */
+  const closeTiles = useCallback(() => {
+    setLook(null);
+    sound.flip();
+    sound.say("Find number one!");
+  }, []);
+
+  const lookActive = look != null;
+  useEffect(() => {
+    if (!lookActive) return;
+    let last = null;
+    const id = setInterval(() => {
+      const rem = Math.ceil((lookEnd.current - now()) / 1000);
+      if (rem <= 0) return closeTiles();
+      if (rem !== last) {
+        if (last != null) sound.tick();
+        last = rem;
+        setLook(rem);
+      }
+    }, 100);
+    return () => clearInterval(id);
+  }, [lookActive, closeTiles]);
 
   /* Stopwatch: starts with the first flip. */
   useEffect(() => {
@@ -108,18 +135,21 @@ export default function NumbersGame() {
     setCheer(null);
     setWon(null);
     sound.shuffle();
-    sound.say("Find number one!");
+    lookEnd.current = now() + lvl.look * 1000;
+    setLook(lvl.look);
+    sound.say("Remember where the numbers are!");
   }, []);
 
   const backToMenu = () => {
     clearTimeout(peekTimer.current);
+    setLook(null);
     sound.say("");
     setRunning(false);
     setLevelId(null);
   };
 
   const tap = (n) => {
-    if (won || n < next || peek != null) return;
+    if (won || n < next || peek != null || look != null) return;
     if (!running && tenths === 0) {
       startAt.current = now(); // the clock starts with the very first flip
       setRunning(true);
@@ -172,7 +202,7 @@ export default function NumbersGame() {
               ))}
             </div>
             <h1 className="toy-title text-5xl sm:text-6xl">Number Hunt</h1>
-            <p className="engraved mt-3 text-lg sm:text-xl">The numbers are hiding under the tiles. Flip them in order: 1, 2, 3… and remember where you saw them!</p>
+            <p className="engraved mt-3 text-lg sm:text-xl">Look at the numbers, then the tiles flip over. Flip them back in order: 1, 2, 3…</p>
           </header>
 
           <section aria-labelledby="level-heading">
@@ -226,7 +256,9 @@ export default function NumbersGame() {
           <p className="engraved flex-1 text-center text-lg font-medium sm:text-xl" aria-live="polite">
             {won
               ? "You did it!"
-              : peek != null
+              : look != null
+                ? `Remember where they are! ${look}…`
+                : peek != null
                 ? `That's ${peek}. Remember it!`
                 : next === 1
                   ? "Flip a tile to find 1!"
@@ -243,7 +275,7 @@ export default function NumbersGame() {
             <div className="num-grid" style={{ "--cols": level.size }}>
               {order.map((n, i) => {
                 const done = n < next;
-                const open = done || peek === n || !!won;
+                const open = done || peek === n || !!won || look != null;
                 return (
                   <NumTile
                     key={n}
@@ -274,6 +306,15 @@ export default function NumbersGame() {
             >
               {cheer.text}
             </div>
+          )}
+        </div>
+
+        {/* Room for the "ready" button, kept so the grid doesn't jump when it goes */}
+        <div className="flex min-h-14 items-center justify-center">
+          {look != null && (
+            <button onClick={closeTiles} className="btn btn-orange sheet-pop px-10">
+              I&apos;m ready!
+            </button>
           )}
         </div>
       </div>
