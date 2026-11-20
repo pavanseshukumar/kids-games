@@ -369,6 +369,22 @@ function SeekCover() {
   );
 }
 
+function NumbersCover() {
+  return (
+    <div className="absolute inset-[8%] flex items-center justify-center">
+      <span className="num-board block h-full aspect-square !p-[3%]">
+        <span className="num-grid num-grid-mini h-full" style={{ "--cols": 3, gap: "5%" }}>
+          {[7, 1, 5, 3, 9, 2, 6, 8, 4].map((n, i) => (
+            <span key={n} className="num-tile" data-paint={["red", "blue", "green", "yellow", "orange", "purple"][i % 6]} data-done={n <= 3}>
+              <span className="num-tile-face !text-[clamp(0.9rem,4vw,1.4rem)]">{n}</span>
+            </span>
+          ))}
+        </span>
+      </span>
+    </div>
+  );
+}
+
 const GAMES = [
   { href: "/games/memory", title: "Memory", blurb: "Flip the cards and find all the pairs.", Cover: MemoryCover, btn: "" },
   // { href: "/games/colours", title: "Colours", blurb: "Drop each thing in the paint of the same colour.", Cover: ColoursCover, btn: "btn-blue" },
@@ -386,6 +402,7 @@ const GAMES = [
   { href: "/games/shadows", title: "Shadow Animals", blurb: "Whose shadow is it? Guess the animal, with clues to help.", Cover: ShadowsCover, btn: "btn-red" },
   { href: "/games/seek", title: "Find It Fast", blurb: "Spot the stars, birds and more in the busy picture. 60 seconds!", Cover: SeekCover, btn: "btn-orange" },
   { href: "/games/oddone", title: "Odd One Out", blurb: "Three go together. Find the one that doesn't belong!", Cover: OddOneCover, btn: "btn-blue" },
+  { href: "/games/numbers", title: "Number Hunt", blurb: "The numbers are mixed up. Tap them in order, fast!", Cover: NumbersCover, btn: "btn-red" },
 ];
 
 export default function Home() {
