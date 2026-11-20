@@ -2042,60 +2042,80 @@ body {
     grid-template-columns: repeat(var(--cols), 1fr);
     gap: clamp(5px, 1.6vw, 10px);
   }
+  /* Two-sided tile: the coloured back with a "?" flips over to the cream number face */
   .num-tile {
     --c: var(--red);
     --c-dark: #a42c22;
     position: relative;
-    display: grid;
+    display: block;
     aspect-ratio: 1;
-    border-radius: 14%;
-    background: var(--c);
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.45),
-      0 4px 0 var(--c-dark),
-      0 7px 10px rgba(40, 18, 0, 0.35);
-    transition: transform 120ms cubic-bezier(0.34, 1.5, 0.5, 1), box-shadow 120ms ease, opacity 250ms ease, filter 250ms ease;
+    perspective: 500px;
+    transition: transform 120ms cubic-bezier(0.34, 1.5, 0.5, 1), opacity 250ms ease, filter 250ms ease;
   }
   .num-tile[data-paint="blue"] { --c: var(--blue); --c-dark: #2261a8; }
   .num-tile[data-paint="green"] { --c: var(--green); --c-dark: #23803f; }
   .num-tile[data-paint="yellow"] { --c: #f2b21c; --c-dark: #b8870a; }
   .num-tile[data-paint="orange"] { --c: var(--orange); --c-dark: #b86a12; }
   .num-tile[data-paint="purple"] { --c: #9b6be0; --c-dark: #6a3fb0; }
-  .num-tile-face {
+  .num-flip {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transition: transform 420ms cubic-bezier(0.34, 1.3, 0.5, 1);
+  }
+  .num-tile[data-open="true"] .num-flip {
+    transform: rotateY(180deg);
+  }
+  .num-face {
+    position: absolute;
+    inset: 0;
     display: grid;
     place-items: center;
-    margin: 9%;
-    border-radius: 10%;
-    background: linear-gradient(180deg, #fffdf6, #fff3d6);
-    box-shadow: inset 0 -2px 0 rgba(120, 80, 30, 0.15), inset 0 1px 0 #fff;
-    color: var(--c-dark);
+    border-radius: 14%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     font-weight: 700;
-    font-size: clamp(1.3rem, calc(26vw / var(--cols)), 3rem);
     line-height: 1;
+    font-size: clamp(1.3rem, calc(26vw / var(--cols)), 3rem);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.45),
+      0 4px 0 var(--c-dark),
+      0 7px 10px rgba(40, 18, 0, 0.35);
+  }
+  .num-back {
+    color: rgba(255, 250, 235, 0.75);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.35), transparent 45%),
+      repeating-linear-gradient(45deg, transparent 0 6px, rgba(255, 255, 255, 0.1) 6px 9px),
+      var(--c);
+  }
+  .num-front {
+    transform: rotateY(180deg);
+    color: var(--c-dark);
     text-shadow: 0 1px 0 #fff;
+    background: linear-gradient(180deg, #fffdf6, #fff3d6);
+    border: clamp(3px, 0.9vw, 6px) solid var(--c);
   }
   button.num-tile:active:not([data-done="true"]) {
     transform: translateY(3px) scale(0.96);
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), 0 1px 0 var(--c-dark), 0 3px 5px rgba(40, 18, 0, 0.35);
   }
-  /* Found: pressed flat into the tray and faded */
+  /* Found: stays open, pressed into the tray and faded */
   .num-tile[data-done="true"] {
     transform: translateY(3px);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-    filter: saturate(0.4);
-    opacity: 0.5;
+    filter: saturate(0.45);
+    opacity: 0.55;
   }
-  button.num-tile[data-done="true"] .num-tile-face {
-    animation: num-found 380ms cubic-bezier(0.34, 1.7, 0.5, 1);
+  .num-tile[data-done="true"] .num-front {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
   }
-  @keyframes num-found {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.25); }
-    100% { transform: scale(1); }
+  /* Wrong flip: the number shows with a red ring until it closes again */
+  .num-tile[data-peek="true"] .num-front {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(229, 72, 59, 0.35), 0 4px 0 var(--c-dark);
   }
-  .num-tile[data-hint="true"] {
-    z-index: 1;
-    animation: tile-hint 1s ease-in-out infinite;
+  .nope-pulse {
+    animation: nope 420ms ease 200ms;
   }
   .num-tile:focus-visible {
     outline: 4px solid var(--yellow);
@@ -2113,8 +2133,11 @@ body {
     background: var(--green);
   }
   /* Small decorative grids (menu header, home card) */
-  .num-grid-mini .num-tile-face {
+  .num-grid-mini .num-face {
     font-size: 1.5rem;
+  }
+  .num-grid-cover .num-face {
+    font-size: clamp(0.9rem, 4vw, 1.4rem);
   }
 
   /* =========================================================

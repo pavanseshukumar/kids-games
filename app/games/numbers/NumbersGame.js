@@ -6,9 +6,10 @@ import { saveBestTime, saveStars, useBestStars, useBestTimes } from "@/lib/progr
 import { AppBar, HomeButton, SoundButton } from "@/components/ui";
 import { LevelButton, StepHeading, WinSheet } from "@/components/game-ui";
 import { BackIcon } from "@/components/icons";
+import { NumTile, PAINTS } from "./art";
 
 const GAME = "numbers";
-const HINT_AFTER = 5000; // ms without the right tap before the next number glows
+const PEEK_MS = 900; // how long a wrong tile stays open before it flips back
 
 const LEVELS = [
   { id: "3", size: 3, name: "Small", detail: "3 × 3 · 1 to 9" },
@@ -16,8 +17,6 @@ const LEVELS = [
   { id: "5", size: 5, name: "Big", detail: "5 × 5 · 1 to 25" },
 ];
 
-// Tile colours cycle so neighbouring numbers don't all look the same.
-const PAINTS = ["red", "blue", "green", "yellow", "orange", "purple"];
 const CHEERS = ["Super!", "Fast fingers!", "Keep going!", "Great!", "Yes!"];
 
 function shuffle(arr) {
@@ -32,6 +31,16 @@ function shuffle(arr) {
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const now = () => Date.now();
 const fmt = (tenths) => (tenths / 10).toFixed(1);
+
+/**
+ * Every wrong flip shows where a number is, so a child with a perfect memory still
+ * makes up to (tiles - 1) wrong flips. Stars allow for that.
+ */
+function starsFor(wrong, cells) {
+  if (wrong <= Math.round(cells * 0.6)) return 3;
+  if (wrong <= Math.round(cells * 1.2)) return 2;
+  return 1;
+}
 
 /** Mini grid for the menu tiles: the level's size, with 1, 2, 3 already found. */
 function GridPreview({ size }) {
@@ -56,7 +65,7 @@ export default function NumbersGame() {
   const [next, setNext] = useState(1); // the number to tap now
   const [mistakes, setMistakes] = useState(0);
   const [nope, setNope] = useState(null); // { n, id } for a wrong tap
-  const [hint, setHint] = useState(false);
+  const [peek, setPeek] = useState(null); // a wrong tile showing its number for a moment
   const [tenths, setTenths] = useState(0);
   const [running, setRunning] = useState(false);
   const [cheer, setCheer] = useState(null);
@@ -66,19 +75,22 @@ export default function NumbersGame() {
   const bestTimes = useBestTimes(GAME);
   const level = LEVELS.find((l) => l.id === levelId);
   const startAt = useRef(0);
-  const lastTap = useRef(0);
+  const peekTimer = useRef(null);
   const ids = useRef(0);
   const nextId = () => ++ids.current;
 
-  useEffect(() => () => sound.say(""), []);
+  useEffect(
+    () => () => {
+      clearTimeout(peekTimer.current);
+      sound.say("");
+    },
+    []
+  );
 
-  /* Stopwatch (starts on the first right tap) plus the "you're stuck" glow. */
+  /* Stopwatch: starts with the first flip. */
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => {
-      setTenths(Math.floor((now() - startAt.current) / 100));
-      if (now() - lastTap.current > HINT_AFTER) setHint(true);
-    }, 100);
+    const id = setInterval(() => setTenths(Math.floor((now() - startAt.current) / 100)), 100);
     return () => clearInterval(id);
   }, [running]);
 
@@ -89,7 +101,8 @@ export default function NumbersGame() {
     setNext(1);
     setMistakes(0);
     setNope(null);
-    setHint(false);
+    clearTimeout(peekTimer.current);
+    setPeek(null);
     setTenths(0);
     setRunning(false);
     setCheer(null);
@@ -99,31 +112,37 @@ export default function NumbersGame() {
   }, []);
 
   const backToMenu = () => {
+    clearTimeout(peekTimer.current);
     sound.say("");
     setRunning(false);
     setLevelId(null);
   };
 
   const tap = (n) => {
-    if (won || n < next) return;
+    if (won || n < next || peek != null) return;
+    if (!running && tenths === 0) {
+      startAt.current = now(); // the clock starts with the very first flip
+      setRunning(true);
+    }
+    sound.flip();
     if (n !== next) {
+      // Wrong tile: show its number for a moment, then close it again. Remember it!
       setMistakes((m) => m + 1);
+      setPeek(n);
       setNope({ n, id: nextId() });
-      sound.boing();
+      sound.say(`That's ${n}.`);
+      peekTimer.current = setTimeout(() => {
+        setPeek(null);
+        sound.flip();
+      }, PEEK_MS);
       return;
     }
     const t = now();
-    if (n === 1) {
-      startAt.current = t;
-      setRunning(true);
-    }
-    lastTap.current = t;
-    setHint(false);
     sound.pop();
     const total = order.length;
     if (n === total) {
       const time = Math.max(1, Math.floor((t - startAt.current) / 100));
-      const stars = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
+      const stars = starsFor(mistakes, total);
       setRunning(false);
       setTenths(time);
       setNext(n + 1);
@@ -149,13 +168,11 @@ export default function NumbersGame() {
           <header className="flex flex-col items-center text-center">
             <div className="num-grid num-grid-mini mb-5 w-40" style={{ "--cols": 3 }} aria-hidden>
               {[7, 1, 5, 3, 9, 2, 6, 8, 4].map((n, i) => (
-                <span key={n} className="num-tile" data-paint={PAINTS[i % PAINTS.length]} data-done={n <= 3}>
-                  <span className="num-tile-face">{n}</span>
-                </span>
+                <NumTile key={n} n={n} paint={PAINTS[i % PAINTS.length]} open={n <= 3 || n === 9} done={n <= 3} />
               ))}
             </div>
             <h1 className="toy-title text-5xl sm:text-6xl">Number Hunt</h1>
-            <p className="engraved mt-3 text-lg sm:text-xl">The numbers are all mixed up. Tap them in order: 1, 2, 3…</p>
+            <p className="engraved mt-3 text-lg sm:text-xl">The numbers are hiding under the tiles. Flip them in order: 1, 2, 3… and remember where you saw them!</p>
           </header>
 
           <section aria-labelledby="level-heading">
@@ -207,7 +224,13 @@ export default function NumbersGame() {
             </span>
           </div>
           <p className="engraved flex-1 text-center text-lg font-medium sm:text-xl" aria-live="polite">
-            {won ? "You did it!" : next === 1 ? "Tap 1 to start the clock!" : hint ? `Where's ${next}? Look for the glow!` : `Now find ${next}!`}
+            {won
+              ? "You did it!"
+              : peek != null
+                ? `That's ${peek}. Remember it!`
+                : next === 1
+                  ? "Flip a tile to find 1!"
+                  : `Now find ${next}!`}
           </p>
           <div className="score-plaque" role="timer" aria-label={`${fmt(tenths)} seconds`}>
             <span className="score-plaque-label">Time</span>
@@ -220,23 +243,24 @@ export default function NumbersGame() {
             <div className="num-grid" style={{ "--cols": level.size }}>
               {order.map((n, i) => {
                 const done = n < next;
+                const open = done || peek === n || !!won;
                 return (
-                  <button
+                  <NumTile
                     key={n}
+                    as="button"
+                    n={n}
+                    // colour by position, not number, so a colour never gives a number away
+                    paint={PAINTS[i % PAINTS.length]}
+                    open={open}
+                    done={done}
+                    peek={peek === n}
                     onClick={() => tap(n)}
-                    className="num-tile deal-in"
+                    className={`deal-in ${nope?.n === n ? "nope-pulse" : ""}`}
                     style={{ "--i": i }}
-                    data-paint={PAINTS[(n - 1) % PAINTS.length]}
-                    data-done={done}
-                    data-hint={hint && n === next && !won}
                     data-n={n}
-                    aria-label={done ? `${n}, found` : `${n}`}
+                    aria-label={open ? `${n}${done ? ", found" : ""}` : "Closed tile"}
                     aria-disabled={done}
-                  >
-                    <span key={nope?.n === n ? nope.id : "still"} className={`num-tile-face ${nope?.n === n ? "nope-shake" : ""}`}>
-                      {n}
-                    </span>
-                  </button>
+                  />
                 );
               })}
             </div>
